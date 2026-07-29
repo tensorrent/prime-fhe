@@ -1,40 +1,49 @@
 // homomorphic_prime_fhe.test.ts
 // =================================================================
-// Verification Suite for Fully Homomorphic Encryption (FHE) Engine over F_137
+// Pure Mathematical Verification Suite for Homomorphic FHE Primitive over F_137
 // =================================================================
 
 import { describe, it, expect } from "vitest";
 import { HomomorphicPrimeFheEngine } from "../src/homomorphic-prime-fhe";
+import { affineMap, antiMap } from "../src/prime-field-137";
 
-describe("Fully Homomorphic Encryption (FHE) Engine over F_137", () => {
-  it("encrypts and decrypts plaintexts accurately via O(1) Anti-Map Inverse", () => {
-    const engine = new HomomorphicPrimeFheEngine(17);
-    const c = engine.encrypt(42);
-    const dec = engine.decrypt(c);
+describe("Pure F_137 Homomorphic FHE Primitive", () => {
+  it("verifies O(1) Anti-Map exact inverse identity antiMap(affineMap(x)) == x", () => {
+    for (let x = 0; x < 137; x++) {
+      const mapped = affineMap(x);
+      const restored = antiMap(mapped);
+      expect(restored).toBe(x);
+    }
+  });
+
+  it("encrypts and decrypts plaintexts accurately", () => {
+    const fhe = new HomomorphicPrimeFheEngine(17);
+    const c = fhe.encrypt(42);
+    const dec = fhe.decrypt(c);
     expect(dec).toBe(42);
   });
 
-  it("performs Homomorphic Addition without noise growth", () => {
-    const engine = new HomomorphicPrimeFheEngine(17);
-    const c1 = engine.encrypt(15);
-    const c2 = engine.encrypt(27);
+  it("performs Homomorphic Addition with zero noise growth", () => {
+    const fhe = new HomomorphicPrimeFheEngine(17);
+    const c1 = fhe.encrypt(15);
+    const c2 = fhe.encrypt(27);
 
-    const c_add = engine.addHomomorphic(c1, c2);
-    const dec_add = engine.decrypt(c_add);
+    const cAdd = fhe.addHomomorphic(c1, c2);
+    const decAdd = fhe.decrypt(cAdd);
 
-    expect(dec_add).toBe((15 + 27) % 137); // 42!
-    expect(c_add.noise_level).toBe(0);
+    expect(decAdd).toBe((15 + 27) % 137);
+    expect(cAdd.noise_level).toBe(0);
   });
 
-  it("performs Homomorphic Multiplication without noise growth or bootstrapping", () => {
-    const engine = new HomomorphicPrimeFheEngine(17);
-    const c1 = engine.encrypt(7);
-    const c2 = engine.encrypt(9);
+  it("performs Homomorphic Multiplication with zero noise growth or bootstrapping", () => {
+    const fhe = new HomomorphicPrimeFheEngine(17);
+    const c1 = fhe.encrypt(7);
+    const c2 = fhe.encrypt(9);
 
-    const c_mult = engine.multiplyHomomorphic(c1, c2);
-    const dec_mult = engine.decrypt(c_mult);
+    const cMult = fhe.multiplyHomomorphic(c1, c2);
+    const decMult = fhe.decrypt(cMult);
 
-    expect(dec_mult).toBe((7 * 9) % 137); // 63!
-    expect(c_mult.noise_level).toBe(0);
+    expect(decMult).toBe((7 * 9) % 137);
+    expect(cMult.noise_level).toBe(0);
   });
 });

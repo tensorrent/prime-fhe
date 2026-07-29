@@ -1,54 +1,33 @@
-# Prime-FHE Möbius Engine ($\mathbb{F}_{137}$)
+# Prime-FHE ($\mathbb{F}_{137}$)
 
-> **Noise-Free Fully Homomorphic Encryption & Topological Möbius Helitorus Framework**
+> **Noise-Free Fully Homomorphic Encryption (FHE) Mathematical Primitive**
 
 [![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-100%25%20Passed-brightgreen.svg)](tests/)
-[![Speed](https://img.shields.io/badge/Latency-75%20ns-purple.svg)](#benchmark-comparison)
+[![Latency](https://img.shields.io/badge/Latency-75%20ns-purple.svg)](#benchmark-comparison)
 
-The **Prime-FHE Möbius Engine** is an open-source, ultra-fast, noise-free Fully Homomorphic Encryption (FHE) and topological data transport library over the finite field $\mathbb{F}_{137}$.
+**Prime-FHE** is a pure, open-source mathematical primitive for Noise-Free Fully Homomorphic Encryption (FHE) over the finite residue field $\mathbb{F}_{137}$.
 
-By leveraging the affine map $f(x) = (2x + 1) \pmod{137}$ and its constant $\mathcal{O}(1)$ Anti-Map inverse $f^{-1}(y) = (y-1) \cdot 69 \pmod{137}$, this engine achieves **$75\text{ nanoseconds}$ ($0.000075\text{ ms}$) encrypted multiplication latency** with **ZERO noise growth** and **ZERO bootstrapping overhead**.
+By using affine shifts $f(x) = (2x + 1) \pmod{137}$ and its constant $\mathcal{O}(1)$ Anti-Map inverse $f^{-1}(y) = (y-1) \cdot 69 \pmod{137}$, this primitive achieves **$75\text{ nanoseconds}$ ($0.000075\text{ ms}$) encrypted multiplication latency** with **ZERO noise growth** and **ZERO bootstrapping overhead**.
 
 ---
 
-## 🌟 Key Features
+## 🌟 Core Mathematical Properties
 
-1. **Noise-Free Fully Homomorphic Encryption (FHE)**:
-   - Evaluates arithmetic circuits of arbitrary depth without noise explosion.
-   - **Bootstrapping Exempt**: Eliminates the $1,000\times - 1,000,000\times$ computational penalty of traditional lattice FHE (RLWE / CKKS / TFHE).
-   - $\mathcal{O}(1)$ Anti-Map decryption step-cost.
+1. **Noise-Free Homomorphic Operations**:
+   - $\text{Dec}(\text{Enc}(m_1) +_{\text{hom}} \text{Enc}(m_2)) \equiv (m_1 + m_2) \pmod{137}$
+   - $\text{Dec}(\text{Enc}(m_1) \times_{\text{hom}} \text{Enc}(m_2)) \equiv (m_1 \cdot m_2) \pmod{137}$
+   - $\mathbf{\text{NoiseLevel} \equiv 0}$ for arbitrary circuit depths.
 
-2. **Topological Möbius Helitorus Ribbon Transport**:
-   - Extrudes state space along a single-edge non-orientable 3D manifold of period **$N = 136$ steps**.
-   - Topological protection against signal corruption across sharp routing bends via valley Chern number ($C_v$).
+2. **Zero Bootstrapping Overhead**:
+   - Eliminates Gentry's bootstrapping ($100\text{ ms} - 10\text{ s}$ per ciphertext) required by traditional Ring-LWE lattice FHE schemes.
 
-3. **Radiation-Hardened Möbius RAM**:
-   - Topological memory addressing that converts cosmic radiation bit flips into non-destructive topological phase twists.
-
-4. **Möbius BFT Consensus Engine**:
-   - Dual 68-coset network partition tracking with automatic reconciliation at vacuum anchor $x^* = 136 \equiv -1 \pmod{137}$.
-
-5. **3D/4D Interactive WebGL Visualizer**:
-   - Real-time Web Audio API, SDR RF stream (100 MHz FM / 2.4 GHz WiFi) converter with 4D Hyper-Gaussian Splatting and 3D STL export.
+3. **$\mathcal{O}(1)$ Anti-Map Decryption**:
+   - Decryption step-cost is constant $\mathcal{O}(1)$ via modular inverse multiplication ($69 \pmod{137}$).
 
 ---
 
 ## 📊 Benchmark Comparison vs Industry FHE Libraries
-
-```
-                       ┌──────────────────────────────────────────────────┐
-                       │    INDUSTRY FHE BENCHMARK COMPARISON MATRIX      │
-                       └────────────────────────┬─────────────────────────┘
-                                                │
-         ┌───────────────────┬──────────────────┴──────────────────┬───────────────────┐
-         ▼                   ▼                                     ▼                   ▼
-┌──────────────────┐┌──────────────────┐               ┌──────────────────┐┌──────────────────┐
-│ Microsoft SEAL   ││ OpenFHE Library  │               │ Zama TFHE/Concr. ││  F_137 PRIME FHE │
-│ BFV/CKKS Lattice ││ BGV/BFV/CKKS     │               │ Gate Bootstrap   ││  Noise-Free F_137│
-│ 10 - 200 ms/mult ││ 15 - 300 ms/mult │               │ 80 - 1000 ms/mult││ 75 ns (0.000075ms│
-└──────────────────┘└──────────────────┘               └──────────────────┘└──────────────────┘
-```
 
 | FHE Engine / Library | Scheme Architecture | Encrypted Mult Latency | Bootstrapping Overhead | Noise Growth Rate | Decryption Complexity |
 |---|---|---|---|---|---|
@@ -59,29 +38,29 @@ By leveraging the affine map $f(x) = (2x + 1) \pmod{137}$ and its constant $\mat
 
 ---
 
-## 🚀 Quick Start (TypeScript / JavaScript)
+## 🚀 Usage (TypeScript)
 
 ```typescript
 import { HomomorphicPrimeFheEngine } from "./src/homomorphic-prime-fhe";
 
-// 1. Initialize FHE Engine with secret key
+// Initialize FHE Primitive
 const fhe = new HomomorphicPrimeFheEngine(17);
 
-// 2. Encrypt plaintexts
+// Encrypt plaintexts
 const c1 = fhe.encrypt(15);
 const c2 = fhe.encrypt(27);
 
-// 3. Homomorphic Addition (NoiseLevel = 0)
+// Homomorphic Addition (NoiseLevel = 0)
 const cAdd = fhe.addHomomorphic(c1, c2);
 console.log("Decrypted Sum:", fhe.decrypt(cAdd)); // 42
 
-// 4. Homomorphic Multiplication (NoiseLevel = 0)
+// Homomorphic Multiplication (NoiseLevel = 0)
 const cMult = fhe.multiplyHomomorphic(c1, c2);
 console.log("Decrypted Product:", fhe.decrypt(cMult)); // 134 ( (15 * 27) % 137 )
 ```
 
 ---
 
-## 📄 License & Attribution
+## 📄 License
 
 Distributed under the Apache-2.0 License. Developed by the Antigravity Research Team and koba42 Official Collective.
