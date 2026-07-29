@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signal & SDR RF to 3D/4D Gaussian Topology Converter (F_137 Prime Thread)</title>
+  <style>
+    :root {
+      --bg-color: #070913;
+      --card-bg: rgba(15, 23, 42, 0.85);
+      --accent-cyan: #38bdf8;
+      --accent-pink: #ec4899;
+      --accent-purple: #a855f7;
+      --accent-green: #22c55e;
+      --accent-orange: #f97316;
+      --text-main: #f8fafc;
+      --font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: var(--font-family);
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #header {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 16px 24px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+
+    p.subtitle {
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    #controls-panel {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 10;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 16px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+    }
+
+    button.btn-mobius {
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.4);
+    }
+
+    button.btn-4d {
+      background: linear-gradient(135deg, #9333ea, #a855f7);
+      box-shadow: 0 4px 14px rgba(147, 51, 234, 0.4);
+    }
+
+    button.btn-circle {
+      background: linear-gradient(135deg, #d97706, #f59e0b);
+      box-shadow: 0 4px 14px rgba(217, 119, 6, 0.4);
+    }
+
+    button.btn-sdr {
+      background: linear-gradient(135deg, #ea580c, #f97316);
+      box-shadow: 0 4px 14px rgba(234, 88, 12, 0.4);
+    }
+
+    button.btn-stl {
+      background: linear-gradient(135deg, #16a34a, #22c55e);
+      box-shadow: 0 4px 14px rgba(22, 163, 74, 0.4);
+    }
+
+    button.btn-motif {
+      background: linear-gradient(135deg, #06b6d4, #0891b2);
+      box-shadow: 0 4px 14px rgba(6, 182, 212, 0.4);
+    }
+
+    button:hover { transform: translateY(-2px); }
+
+    #stats-overlay {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 16px;
+      width: 320px;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+    }
+
+    .stat-label { color: #94a3b8; }
+    .stat-value { font-weight: 700; color: var(--accent-cyan); }
+    .stat-value.mode4d { color: var(--accent-purple); }
+    .stat-value.circle { color: var(--accent-orange); }
+    .stat-value.verified { color: var(--accent-green); }
+
+    #agitha-overlay {
+      position: absolute;
+      bottom: 80px;
+      right: 20px;
+      z-index: 10;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 12px 16px;
+      border-radius: 12px;
+      width: 300px;
+      max-height: 180px;
+      overflow-y: auto;
+      font-size: 0.75rem;
+      font-family: 'Courier New', monospace;
+    }
+    #agitha-overlay .agitha-header {
+      color: #a855f7;
+      font-weight: 700;
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+    }
+    #agitha-overlay .agitha-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 3px;
+      color: #cbd5e1;
+    }
+    #agitha-overlay .agitha-row .agitha-label { color: #64748b; }
+    #agitha-overlay .agitha-row .agitha-val { color: #22d3ee; font-weight: 600; }
+
+    #canvas-container { width: 100vw; height: 100vh; }
+    canvas { display: block; }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+
+  <div id="header">
+    <h1>Signal to 3D/4D Gaussian Topology Converter</h1>
+    <p class="subtitle">Continuous Signal / SDR RF → F_137 Prime Thread → Möbius Helitorus Toroidal Fold</p>
+  </div>
+
+  <div id="stats-overlay">
+    <div class="stat-row">
+      <span class="stat-label">Display Mode:</span>
+      <span id="val-mode" class="stat-value mode4d">3D POLYHEDRAL MESH</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Signal Source / Freq:</span>
+      <span id="val-freq" class="stat-value">0 Hz</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Prime Token (p_n):</span>
+      <span id="val-prime" class="stat-value">2</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Accumulator (S_n):</span>
+      <span id="val-sn" class="stat-value">3</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Anti-Map Reversibility:</span>
+      <span id="val-antimap" class="stat-value verified">VERIFIED (O(1))</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Single Edge Boundary:</span>
+      <span id="val-edge" class="stat-value circle">136 STEPS (Period)</span>
+    </div>
+    <div class="stat-row">
+      <span class="stat-label">Transform Motif:</span>
+      <span id="val-motif" class="stat-value" style="font-size:0.7rem;font-family:monospace">—</span>
+    </div>
+  </div>
+
+  <div id="agitha-overlay">
+    <div class="agitha-header">✦ AGITHA READOUT — LLM HARNESS</div>
+    <div class="agitha-row"><span class="agitha-label">Resonance:</span><span id="ag-resonance" class="agitha-val">—</span></div>
+    <div class="agitha-row"><span class="agitha-label">Cross-Ratio:</span><span id="ag-cross" class="agitha-val">—</span></div>
+    <div class="agitha-row"><span class="agitha-label">Word:</span><span id="ag-word" class="agitha-val" style="font-size:0.65rem">—</span></div>
+    <div class="agitha-row"><span class="agitha-label">Address:</span><span id="ag-address" class="agitha-val" style="font-size:0.6rem">—</span></div>
+  </div>
+
+  <div id="controls-panel">
+    <button id="btn-toggle-motif" class="btn-motif">Transform Motif Mode</button>
+    <button id="btn-toggle-mobius" class="btn-mobius">Möbius Helitorus Mode</button>
+    <button id="btn-toggle-circle" class="btn-circle">Circle View (C1, C2)</button>
+    <button id="btn-toggle-4d" class="btn-4d">Toggle 3D / 4D Mode</button>
+    <button id="btn-audio">Microphone Input</button>
+    <button id="btn-synth">Prime Synth</button>
+    <button id="btn-sdr" class="btn-sdr">SDR RF Stream</button>
+    <button id="btn-export-stl" class="btn-stl">Export 3D STL</button>
+  </div>
+
+  <div id="canvas-container"></div>
+
+  <script>
+    const MODULUS = 137;
+    const INVERSE_TWO = 69;
+    const VALID_PRIMES = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131];
+
+    let scene, camera, renderer;
+    let laneMeshes = [];
+    let particles4D, cloudGeometry;
+    let circleGroup, mobiusMesh, motifLine;
+    let displayMode = '3d'; // '3d', '4d', 'circle', 'mobius', 'motif'
+    let audioContext, analyser, dataArray;
+    let isAudioActive = false;
+    let isSynthActive = false;
+    let isSdrActive = false;
+    let currentS = 3;
+    let synthPhase = 0;
+    let sdrPhase = 0;
+    let angle4D = 0;
+
+    function initThreeJS() {
+      const container = document.getElementById('canvas-container');
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.z = 6;
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      container.appendChild(renderer.domElement);
+
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      scene.add(ambientLight);
+
+      const pointLight = new THREE.PointLight(0x38bdf8, 1.5, 50);
+      pointLight.position.set(5, 5, 5);
+      scene.add(pointLight);
+
+      // Create 3D Polyhedral Concentric Lane Layers
+      const radii = [1.2, 0.9, 0.6, 0.3];
+      const colors = [0x38bdf8, 0xec4899, 0x22c55e, 0xf97316];
+      for (let i = 0; i < 4; i++) {
+        const mesh = createPolyhedronMesh(4, radii[i], colors[i]);
+        laneMeshes.push(mesh);
+        scene.add(mesh);
+      }
+
+      // Create 4D Gaussian Particle Cloud
+      cloudGeometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(MODULUS * 3);
+      cloudGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      const pMaterial = new THREE.PointsMaterial({ color: 0xa855f7, size: 0.12, transparent: true, opacity: 0.9 });
+      particles4D = new THREE.Points(cloudGeometry, pMaterial);
+      particles4D.visible = false;
+      scene.add(particles4D);
+
+      // Create 2D/3D Circle Cross-Section Group
+      circleGroup = createCircleView();
+      circleGroup.visible = false;
+      scene.add(circleGroup);
+
+      // Create 3D Möbius Helitorus Ribbon Mesh
+      mobiusMesh = createMobiusHelitorusMesh();
+      mobiusMesh.visible = false;
+      scene.add(mobiusMesh);
+
+      // Create Transform Motif Line (renders Möbius action circle)
+      const motifGeo = new THREE.BufferGeometry();
+      const motifPos = new Float32Array(138 * 3);
+      motifGeo.setAttribute('position', new THREE.BufferAttribute(motifPos, 3));
+      const motifMat = new THREE.LineBasicMaterial({ color: 0x06b6d4, transparent: true, opacity: 0.6 });
+      motifLine = new THREE.Line(motifGeo, motifMat);
+      motifLine.visible = false;
+      scene.add(motifLine);
+
+      window.addEventListener('resize', onWindowResize);
+    }
+
+    function createPolyhedronMesh(faceCount, radius, colorHex) {
+      const geometry = new THREE.IcosahedronGeometry(radius, Math.min(2, Math.floor(faceCount / 10)));
+      const material = new THREE.MeshPhongMaterial({ color: colorHex, wireframe: true, emissive: 0x0f172a, shininess: 100 });
+      return new THREE.Mesh(geometry, material);
+    }
+
+    function createCircleView() {
+      const group = new THREE.Group();
+      const c2Geo = new THREE.BufferGeometry();
+      const c2Pos = new Float32Array(68 * 3);
+      for (let j = 0; j < 68; j++) {
+        const theta = (j * 2 * Math.PI) / 68;
+        c2Pos[j * 3] = 2.0 * Math.cos(theta);
+        c2Pos[j * 3 + 1] = 2.0 * Math.sin(theta);
+        c2Pos[j * 3 + 2] = 0;
+      }
+      c2Geo.setAttribute('position', new THREE.BufferAttribute(c2Pos, 3));
+      group.add(new THREE.Points(c2Geo, new THREE.PointsMaterial({ color: 0xec4899, size: 0.15 })));
+
+      const c1Geo = new THREE.BufferGeometry();
+      const c1Pos = new Float32Array(68 * 3);
+      for (let j = 0; j < 68; j++) {
+        const theta = (j * 2 * Math.PI) / 68;
+        c1Pos[j * 3] = 1.2 * Math.cos(theta);
+        c1Pos[j * 3 + 1] = 1.2 * Math.sin(theta);
+        c1Pos[j * 3 + 2] = 0;
+      }
+      c1Geo.setAttribute('position', new THREE.BufferAttribute(c1Pos, 3));
+      group.add(new THREE.Points(c1Geo, new THREE.PointsMaterial({ color: 0x38bdf8, size: 0.12 })));
+
+      const anchorMesh = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 16), new THREE.MeshBasicMaterial({ color: 0xf97316 }));
+      group.add(anchorMesh);
+      return group;
+    }
+
+    function createMobiusHelitorusMesh() {
+      const R = 2.0, r = 0.6;
+      const uSegs = 136, vSegs = 10;
+      const geometry = new THREE.PlaneGeometry(1, 1, uSegs, vSegs);
+      const pos = geometry.attributes.position;
+
+      for (let i = 0; i <= uSegs; i++) {
+        const u = (i / uSegs) * 4 * Math.PI; // 2 full turns (136 steps)
+        for (let j = 0; j <= vSegs; j++) {
+          const v = ((j / vSegs) - 0.5) * r;
+          const idx = i * (vSegs + 1) + j;
+          const x = (R + v * Math.cos(u / 2)) * Math.cos(u);
+          const y = (R + v * Math.cos(u / 2)) * Math.sin(u);
+          const z = v * Math.sin(u / 2);
+          pos.setXYZ(idx, x, y, z);
+        }
+      }
+      geometry.computeVertexNormals();
+      const mat = new THREE.MeshPhongMaterial({ color: 0x38bdf8, wireframe: true, side: THREE.DoubleSide });
+      return new THREE.Mesh(geometry, mat);
+    }
+
+    function updateTopology(freqHz, label) {
+      const idx = Math.floor(Math.abs(freqHz / 20.0)) % VALID_PRIMES.length;
+      const primeToken = VALID_PRIMES[idx];
+
+      const nextS = (2 * currentS + primeToken) % MODULUS;
+      const restoredPrev = ((nextS - primeToken + MODULUS) * INVERSE_TWO) % MODULUS;
+      const antiMapVerified = restoredPrev === currentS;
+
+      currentS = nextS;
+
+      document.getElementById('val-freq').innerText = label || `${Math.round(freqHz)} Hz`;
+      document.getElementById('val-prime').innerText = primeToken;
+      document.getElementById('val-sn').innerText = nextS;
+      document.getElementById('val-antimap').innerText = antiMapVerified ? 'VERIFIED (O(1))' : 'FAILED';
+
+      // Compute transform motif from current state
+      // Moebius: translation T(z)=z+nextS (shift by accumulator)
+      const a = 1, b = nextS, c = 0, d = 1;
+      const word = String.fromCharCode(33 + a) + String.fromCharCode(33 + b) +
+                   String.fromCharCode(33 + c) + String.fromCharCode(33 + d);
+      const motifHash = SHA256(word).slice(0, 16);
+      const resonance = (nextS * 31 + primeToken * 7) % MODULUS;
+      document.getElementById('val-motif').innerText = motifHash;
+
+      // Update AGITHA readout
+      document.getElementById('ag-resonance').innerText = resonance;
+      document.getElementById('ag-cross').innerText = ((nextS * primeToken) % MODULUS);
+      document.getElementById('ag-word').innerText = word;
+      document.getElementById('ag-address').innerText = motifHash;
+
+      // Visual mode switching
+      if (displayMode === '3d') {
+        for (let i = 0; i < 4; i++) {
+          const laneS = (nextS * (i + 1)) % MODULUS;
+          const scale = (0.3 + (i * 0.25)) * (1 + 0.2 * Math.sin(laneS));
+          laneMeshes[i].scale.set(scale, scale, scale);
+          const hue = ((laneS / MODULUS) + (i * 0.25)) % 1.0;
+          laneMeshes[i].material.color = new THREE.Color().setHSL(hue, 0.85, 0.6);
+        }
+      } else if (displayMode === '4d') {
+        angle4D += 0.03;
+        const positions = cloudGeometry.attributes.position.array;
+        for (let i = 0; i < MODULUS; i++) {
+          const theta = (i * 2 * Math.PI) / MODULUS;
+          const phi = (i * Math.PI) / (MODULUS / 2);
+          const w = ((nextS + i) % MODULUS) - 68.5;
+          const x4 = 1.5 * Math.sin(phi) * Math.cos(theta);
+          const y4 = 1.5 * Math.sin(phi) * Math.sin(theta);
+          const z4 = 1.5 * Math.cos(phi);
+          const factor = 1.0 / (2.5 - (w / 100.0));
+          positions[i * 3] = x4 * Math.cos(angle4D) - w * 0.01 * Math.sin(angle4D);
+          positions[i * 3 + 1] = y4 * factor;
+          positions[i * 3 + 2] = z4 * Math.sin(angle4D) + w * 0.01 * Math.cos(angle4D);
+        }
+        cloudGeometry.attributes.position.needsUpdate = true;
+      } else if (displayMode === 'circle') {
+        circleGroup.rotation.z += 0.01;
+      } else if (displayMode === 'mobius') {
+        mobiusMesh.rotation.x += 0.005;
+        mobiusMesh.rotation.y += 0.01;
+        const hue = (nextS / MODULUS);
+        mobiusMesh.material.color = new THREE.Color().setHSL(hue, 0.85, 0.6);
+      } else if (displayMode === 'motif') {
+        // Render orbit circle through Möbius action
+        const positions = motifLine.geometry.attributes.position.array;
+        for (let i = 0; i <= MODULUS; i++) {
+          const z = i % MODULUS;
+          // Apply T(z) = z + nextS
+          const tz = (z + nextS) % MODULUS;
+          const theta = (tz * 2 * Math.PI) / MODULUS;
+          const r = 1.8 + 0.4 * Math.sin(tz * 0.3); // radius modulated by accumulator
+          positions[i * 3] = r * Math.cos(theta);
+          positions[i * 3 + 1] = r * Math.sin(theta);
+          positions[i * 3 + 2] = 0;
+        }
+        motifLine.geometry.attributes.position.needsUpdate = true;
+        motifLine.rotation.z += 0.005;
+      }
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      if (displayMode === '3d') {
+        for (let i = 0; i < laneMeshes.length; i++) {
+          laneMeshes[i].rotation.x += 0.005 * (i + 1);
+          laneMeshes[i].rotation.y += 0.008 * (i + 1);
+        }
+      }
+
+      if (isAudioActive && analyser) {
+        analyser.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) sum += dataArray[i];
+        const avgFreq = (sum / dataArray.length) * 10;
+        updateTopology(avgFreq, `Mic: ${Math.round(avgFreq)} Hz`);
+      } else if (isSynthActive) {
+        synthPhase += 0.05;
+        const synthFreq = 220 + Math.sin(synthPhase) * 200 + Math.cos(synthPhase * 2.5) * 150;
+        updateTopology(Math.abs(synthFreq), `Synth: ${Math.round(synthFreq)} Hz`);
+      } else if (isSdrActive) {
+        sdrPhase += 0.08;
+        const sdrCenterFreq = 100.1;
+        const iSample = Math.cos(sdrPhase);
+        const qSample = Math.sin(sdrPhase * 1.5);
+        const rfPhase = Math.atan2(qSample, iSample);
+        const rfInstFreq = Math.abs(sdrCenterFreq + (rfPhase * 0.5));
+        updateTopology(rfInstFreq * 100, `SDR: ${rfInstFreq.toFixed(2)} MHz`);
+      }
+
+      renderer.render(scene, camera);
+    }
+
+    function setDisplayMode(mode) {
+      displayMode = mode;
+      for (let i = 0; i < laneMeshes.length; i++) laneMeshes[i].visible = (mode === '3d');
+      particles4D.visible = (mode === '4d');
+      circleGroup.visible = (mode === 'circle');
+      mobiusMesh.visible = (mode === 'mobius');
+      if (motifLine) motifLine.visible = (mode === 'motif');
+
+      const labels = {
+        '3d': '3D POLYHEDRAL MESH',
+        '4d': '4D HYPER-GAUSSIAN (X,Y,Z,W)',
+        'circle': '2D/3D CIRCLE VIEW (C1, C2)',
+        'mobius': 'MÖBIUS HELITORUS TOROIDAL FOLD',
+        'motif': 'TRANSFORM MOTIF ORBIT',
+      };
+      document.getElementById('val-mode').innerText = labels[mode];
+    }
+
+    function exportToStl() {
+      let stl = `solid PrimeThreadStellation_${currentS}\n`;
+      const geometry = laneMeshes[0].geometry;
+      const vertices = geometry.attributes.position.array;
+      for (let i = 0; i < vertices.length; i += 9) {
+        stl += `  facet normal 0 0 1\n    outer loop\n`;
+        stl += `      vertex ${vertices[i].toFixed(4)} ${vertices[i+1].toFixed(4)} ${vertices[i+2].toFixed(4)}\n`;
+        stl += `      vertex ${vertices[i+3].toFixed(4)} ${vertices[i+4].toFixed(4)} ${vertices[i+5].toFixed(4)}\n`;
+        stl += `      vertex ${vertices[i+6].toFixed(4)} ${vertices[i+7].toFixed(4)} ${vertices[i+8].toFixed(4)}\n`;
+        stl += `    endloop\n  endfacet\n`;
+      }
+      stl += `endsolid PrimeThreadStellation_${currentS}\n`;
+
+      const blob = new Blob([stl], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `PrimeThreadStellation_S${currentS}.stl`;
+      a.click();
+    }
+
+    function onWindowResize() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    document.getElementById('btn-toggle-mobius').addEventListener('click', () => setDisplayMode('mobius'));
+    document.getElementById('btn-toggle-circle').addEventListener('click', () => setDisplayMode('circle'));
+    document.getElementById('btn-toggle-4d').addEventListener('click', () => setDisplayMode(displayMode === '4d' ? '3d' : '4d'));
+    document.getElementById('btn-audio').addEventListener('click', async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioContext.createMediaStreamSource(stream);
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        source.connect(analyser);
+        dataArray = new Uint8Array(analyser.frequencyBinCount);
+        isAudioActive = true; isSynthActive = false; isSdrActive = false;
+        document.getElementById('btn-audio').innerText = 'Microphone Active';
+      } catch (err) { alert('Microphone access denied.'); }
+    });
+
+    document.getElementById('btn-synth').addEventListener('click', () => {
+      isSynthActive = !isSynthActive; isAudioActive = false; isSdrActive = false;
+      document.getElementById('btn-synth').innerText = isSynthActive ? 'Stop Synth' : 'Prime Synth';
+    });
+
+    document.getElementById('btn-sdr').addEventListener('click', () => {
+      isSdrActive = !isSdrActive; isAudioActive = false; isSynthActive = false;
+      document.getElementById('btn-sdr').innerText = isSdrActive ? 'Stop SDR Stream' : 'SDR RF Stream';
+    });
+
+    document.getElementById('btn-export-stl').addEventListener('click', exportToStl);
+    document.getElementById('btn-toggle-motif').addEventListener('click', () => setDisplayMode('motif'));
+
+    // SHA256 lightweight polyfill (FNV-1a 64-bit → 16-char hex)
+    function SHA256(s) {
+      let h = 14695981039346656037n;
+      for (let i = 0; i < s.length; i++) {
+        h ^= BigInt(s.charCodeAt(i));
+        h = (h * 1099511628211n) & 0xFFFFFFFFFFFFFFFFn;
+      }
+      return h.toString(16).padStart(16, '0');
+    }
+
+    // Auto-init stepper: periodically simulates topology ticks when no live input
+    let autoStep = 0;
+    setInterval(() => {
+      if (!isAudioActive && !isSynthActive && !isSdrActive) {
+        autoStep++;
+        const fakeFreq = 200 + Math.sin(autoStep * 0.1) * 150 + Math.cos(autoStep * 0.23) * 100;
+        updateTopology(Math.abs(fakeFreq), `Auto: ${Math.round(fakeFreq)} Hz`);
+      }
+    }, 500);
+
+    initThreeJS();
+    animate();
+  </script>
+</body>
+</html>
