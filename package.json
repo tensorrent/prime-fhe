@@ -1,7 +1,7 @@
 {
   "name": "prime-fhe-mobius-engine",
   "version": "1.0.0",
-  "description": "Noise-Free Fully Homomorphic Encryption & Topological Möbius Helitorus Framework over F_137",
+  "description": "Noise-Free Fully Homomorphic Encryption & Topological M\u00f6bius Helitorus Framework over F_137",
   "main": "src/homomorphic-prime-fhe.ts",
   "scripts": {
     "test": "vitest run"
@@ -15,7 +15,7 @@
     "cryptography"
   ],
   "author": "koba42 Official & Antigravity Research Team",
-  "license": "Apache-2.0",
+  "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
     "typescript": "^5.0.0",
     "vitest": "^1.6.0"

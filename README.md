@@ -2,7 +2,7 @@
 
 > **Sub-Microsecond Scalar Field Homomorphic Protocols & Zero-Knowledge In-Stream Private Set Intersection (H-PSI)**
 
-[![License](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-SIP%20v1.1-blue.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-21%2F21%20Passed-brightgreen.svg)](tests/)
 [![Latency](https://img.shields.io/badge/Latency-736%20ns-purple.svg)](#benchmark-taxonomy)
 [![Throughput](https://img.shields.io/badge/Throughput-1.36%20MHz-orange.svg)](#zero-knowledge-content-matching-h-psi)
@@ -109,6 +109,7 @@ const cMult = engine.serverMultiplyBlinded(c1, c2, handle);
 
 ## 📄 License & Attribution
 
-Distributed under the **Apache-2.0 License**.  
+Distributed under the **Sovereign Integrity Protocol License (SIP License v1.1)** — see [LICENSE](LICENSE).
+Free for personal, family, educational, and self-study use; commercial use requires a prior written license.  
 Authored by **Brad Wallace** ([`coo@koba42.com`](mailto:coo@koba42.com)).  
 Public Repository: [github.com/tensorrent/prime-fhe](https://github.com/tensorrent/prime-fhe)
