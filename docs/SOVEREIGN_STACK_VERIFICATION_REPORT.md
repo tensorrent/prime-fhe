@@ -71,17 +71,20 @@ All benchmarks run encrypted vector operations over $\mathbb{F}_P$ ($P = 2^{256}
 
 ---
 
-## Hugging Face Dataset
+## Dedicated Hugging Face Component Datasets
 
-All raw benchmark JSONs, evaluation runs, and dataset cards are published at:  
-**[huggingface.co/datasets/K42COO/MA-HP-FHE-Benchmarks](https://huggingface.co/datasets/K42COO/MA-HP-FHE-Benchmarks)**
+Every core component of the Sovereign Stack now has a dedicated dataset repository on the Hugging Face Hub:
 
-- `benchmarks/full_benchmark_suite_results.json` (HumanEval+ & MBPP+ 100-task batch sweep)
-- `benchmarks/hardest_coding_benchmarks.json` (LiveCodeBench-HARD, HumanEval+, MBPP+)
-- `benchmarks/swe_bench_verified_live_run.json` (SWE-bench Verified)
-- `benchmarks/tough_coding_benchmarks.json` (LiveCodeBench, HumanEvalPack)
-- `benchmarks/sovereign_stack_functional_benchmarks.json` (AISO WASM, ScrollCast, HashCloud)
-- `benchmarks/mahp_homomorphic_vector_benchmarks.json` (MA-HP FHE Embeddings)
+1. 🧠 **AISO Private AI**: **[huggingface.co/datasets/K42COO/AISO-Private-AI-Benchmarks](https://huggingface.co/datasets/K42COO/AISO-Private-AI-Benchmarks)**
+   - WASM ReasoningPipeline, 10K query parity, P50=1.28ms, CDCL qualia constraints.
+2. ☁️ **HashCloud-SPE**: **[huggingface.co/datasets/K42COO/HashCloud-SPE-Benchmarks](https://huggingface.co/datasets/K42COO/HashCloud-SPE-Benchmarks)**
+   - Content-addressed symbolic pointer storage, 12 compiled Rust crates, homomorphic shard aggregation.
+3. ⚡ **CUDNT Translator**: **[huggingface.co/datasets/K42COO/CUDNT-Translator-Benchmarks](https://huggingface.co/datasets/K42COO/CUDNT-Translator-Benchmarks)**
+   - CUDA-to-Rust native translation bridge, 1024-dim encrypted vector evaluation (1.42 ms).
+4. 🔌 **SparsePlug Compression**: **[huggingface.co/datasets/K42COO/SparsePlug-Compression-Benchmarks](https://huggingface.co/datasets/K42COO/SparsePlug-Compression-Benchmarks)**
+   - Hardware-adaptive sparsity profiler, TrinityWasm compression (< 1% degradation at 90% sparsity).
+5. 📊 **Master Benchmark Dataset**: **[huggingface.co/datasets/K42COO/MA-HP-FHE-Benchmarks](https://huggingface.co/datasets/K42COO/MA-HP-FHE-Benchmarks)**
+   - Cross-project verification, AI coding benchmarks (SWE-bench, LiveCodeBench, HumanEval+).
 
 ---
 
