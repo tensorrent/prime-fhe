@@ -61,48 +61,73 @@ describe("Vision Reasoning Engine (VRE) — Layer 1 of Sovereign Stack AI v2", (
     expect(new Set(matches.map((m) => m.motif_label)).size).toBe(2);
   });
 
-  // ⚠️ KNOWN DEFECT, pinned rather than hidden.
-  //
-  // encryptImage returns { ciphertexts, masks }. homomorphicForward() and
-  // groundSceneGraph() take only the ciphertexts and NEVER reference the masks
-  // — grep the file. So the MA-HP masks are never removed, and every
-  // "similarity score" is the true dot product plus accumulated UNIFORM random
-  // masks. Uniform noise dominates, so the scores are random and the ranking is
-  // a coin flip.
-  //
-  // This is what made the test above fail ~half the time. Fixing it means
-  // threading masks through the ViT forward pass and the grounding step so the
-  // client can strip them — the same discipline the MA-HP protocol already uses
-  // for add and Beaver-multiply, applied to this pipeline.
-  //
-  // Until then this test asserts the DEFECT, so it cannot silently reappear as
-  // flakiness somewhere downstream.
-  it("DEFECT: grounding scores depend on the ephemeral masks, not the image", () => {
-    const ground = () => {
-      // Identical key, identical image, identical motif database. The ONLY thing
-      // that differs between calls is the fresh random mask per patch.
-      const client = new UnifiedClient(0x2f1a4b7c9d3e5f81n);
-      const encTensor = client.encryptImage(new Uint8Array(64).fill(100), [8, 8, 1]);
+  // The regression guard for a defect that used to make this whole pipeline
+  // meaningless: encryptImage produced MA-HP ciphertexts (c = k·m + r, fresh
+  // uniform r per patch) while the forward pass and grounding received only the
+  // ciphertexts. The masks were never removed, so every "similarity score" was
+  // dominated by uniform noise — identical inputs gave different scores and the
+  // motif ranking was a coin flip. Masks are now carried with their ciphertexts
+  // through both operations, which are linear in the mask.
+  const KEY = 0x2f1a4b7c9d3e5f81n;
+  const IMAGE = new Uint8Array(64).fill(100);
+  const MOTIFS = (): Map<string, { label: string; motif_vector: bigint[] }> =>
+    new Map([
+      ["MOTIF_UI_EXCEPTION", { label: "UI Traceback Dialog", motif_vector: [5n, 12n, 3n] }],
+      ["MOTIF_CAD_SCHEMATIC", { label: "CAD Wiring Diagram", motif_vector: [1n, 2n, 1n] }],
+    ]);
+  const ground = () => {
+    const client = new UnifiedClient(KEY);
+    const tensor = client.encryptImage(IMAGE, [8, 8, 1]);
+    const vit = new HomomorphicViTEncoder(client.key);
+    return vit.groundSceneGraph(vit.homomorphicForward(tensor), MOTIFS());
+  };
+
+  it("grounding is deterministic: the masks no longer leak into the score", () => {
+    // The masks differ on every call — only their removal makes this stable.
+    const scores = new Set(
+      Array.from({ length: 8 }, () => ground().map((m) => `${m.motif_id}:${m.similarity_score}`).join("|")),
+    );
+    expect(scores.size).toBe(1);
+  });
+
+  it("scores are the TRUE dot product — verified against plaintext arithmetic", () => {
+    const P = (1n << 256n) - 189n;
+    const CHUNK = 31;
+    const WEIGHTS = [3n, 7n, 11n];
+
+    // Recompute what the pipeline should produce, entirely in the clear.
+    const patches: bigint[] = [];
+    for (let off = 0; off < IMAGE.length; off += CHUNK) {
+      const chunk = IMAGE.subarray(off, off + CHUNK);
+      let v = 0n;
+      for (let i = 0; i < chunk.length; i++) v += BigInt(chunk[i]) * 256n ** BigInt(i);
+      patches.push(v % P);
+    }
+
+    const expected = new Map<string, bigint>();
+    for (const [id, data] of MOTIFS()) {
+      let acc = 0n;
+      for (let i = 0; i < patches.length; i++) {
+        const w = WEIGHTS[i % WEIGHTS.length];
+        const v = data.motif_vector[i % data.motif_vector.length];
+        acc = (acc + v * w * patches[i]) % P;
+      }
+      expected.set(id, acc);
+    }
+
+    for (const match of ground()) {
+      expect(match.similarity_score).toBe(expected.get(match.motif_id));
+    }
+  });
+
+  it("a different image gives a different score — the output tracks the input", () => {
+    const other = () => {
+      const client = new UnifiedClient(KEY);
+      const tensor = client.encryptImage(new Uint8Array(64).fill(37), [8, 8, 1]);
       const vit = new HomomorphicViTEncoder(client.key);
-      const db = new Map<string, { label: string; motif_vector: bigint[] }>([
-        ["MOTIF_UI_EXCEPTION", { label: "UI Traceback Dialog", motif_vector: [5n, 12n, 3n] }],
-        ["MOTIF_CAD_SCHEMATIC", { label: "CAD Wiring Diagram", motif_vector: [1n, 2n, 1n] }],
-      ]);
-      return vit.groundSceneGraph(vit.homomorphicForward(encTensor), db);
+      return vit.groundSceneGraph(vit.homomorphicForward(tensor), MOTIFS());
     };
-
-    // Same inputs, different scores — because the masks leak into the result.
-    const scores = new Set<string>();
-    for (let i = 0; i < 8; i++) scores.add(ground()[0].similarity_score.toString());
-    expect(scores.size).toBeGreaterThan(1); // deterministic grounding would give exactly 1
-
-    // And the masks are structurally unavailable to the computation: the forward
-    // pass is handed ciphertexts only, so it COULD NOT remove them if it tried.
-    const client = new UnifiedClient(0x2f1a4b7c9d3e5f81n);
-    const tensor = client.encryptImage(new Uint8Array(64).fill(100), [8, 8, 1]);
-    expect(tensor.masks.length).toBe(tensor.ciphertexts.length); // they exist…
-    expect(tensor.masks.some((m) => m !== 0n)).toBe(true);       // …are nonzero…
-    // …and never reach groundSceneGraph, which is why the scores are noise.
+    expect(other()[0].similarity_score).not.toBe(ground()[0].similarity_score);
   });
 
   it("should execute full VRE pipeline (Encrypted Image → Homomorphic ViT → CAS Grounding → Encrypted Action Code)", () => {

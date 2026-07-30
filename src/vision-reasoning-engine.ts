@@ -11,8 +11,7 @@
  */
 
 import { InteractiveClientAssistedFheEngine } from "./interactive-client-assisted-fhe.js";
-import { BigIntHomomorphicFheEngine } from "./prime-field-bigint.js";
-import { ExtendedHomomorphicFheOperations } from "./prime-fhe-operations.js";
+import { MultiRingShiftCipher } from "./multi-ring-shift-cipher.js";
 import {
   UnifiedPrivateAIPlatformClient,
   SecureEnclaveAgent,
@@ -44,6 +43,27 @@ export interface SceneGraphMotifMatch {
   motif_id: string;
   motif_label: string;
   similarity_score: bigint; // Homomorphic dot product over F_P
+}
+
+/**
+ * An embedding travelling through the ViT, carrying the mask that must be
+ * removed to read it.
+ *
+ * This pairing is the fix for a defect where the two halves of MA-HP were split
+ * apart: `encryptImage` produced `c = k·m + r` with a fresh uniform r per patch,
+ * but the forward pass and grounding received only the ciphertexts. The masks
+ * were structurally unavailable, so they were never removed and every
+ * similarity score was dominated by uniform noise — identical inputs produced
+ * different scores and the motif ranking was a coin flip.
+ *
+ * A masked value and its mask are one object. Splitting them is what allowed
+ * them to drift apart in the first place.
+ */
+export interface MaskedEmbedding {
+  ciphertext: bigint;
+  mask: bigint;
+  /** Always 0 — exact field arithmetic, retained for shape compatibility. */
+  noise_level: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -123,33 +143,49 @@ export class VisionReasoningEngineClient {
 // ---------------------------------------------------------------------------
 
 export class HomomorphicViTEncoder {
-  private fheEngine: BigIntHomomorphicFheEngine;
-  private ops: ExtendedHomomorphicFheOperations;
+  private ring: MultiRingShiftCipher;
+  private secretKey: bigint;
 
   constructor(secretKey: bigint) {
-    this.fheEngine = new BigIntHomomorphicFheEngine(secretKey, P);
-    this.ops = new ExtendedHomomorphicFheOperations(this.fheEngine, P);
+    // MA-HP additive-ring algebra, matching what encryptImage actually produces
+    // (c = k·m + r). The previous implementation used BigIntHomomorphicFheEngine,
+    // whose ciphertexts carry a CONSTANT offset of 1 (c = k·m + 1) and whose
+    // scale/add correct for that offset — a different, incompatible format.
+    // Feeding MA-HP ciphertexts through those ops left a residue of
+    // (r − 1)·w·k⁻¹ in every result, which is the full-range noise that made the
+    // grounding scores meaningless. One algebra now, reusing the primitive that
+    // is already tested (src/multi-ring-shift-cipher.ts) rather than a third
+    // parallel implementation.
+    this.ring = new MultiRingShiftCipher(P);
+    this.secretKey = secretKey;
   }
 
   /**
    * Perform homomorphic Vision Transformer (ViT) forward pass over encrypted patches:
    * 1. Linear Patch Projection (Homomorphic Scalar Matrix Multiplication)
-   * 2. Polynomial GELU Activation Approximation: f(x) = x^2 + 2x mod P
-   * 3. Aggregated Patch Embedding Generation
+   * 2. Aggregated Patch Embedding Generation
+   *
+   * Scaling is linear, so the mask scales with the ciphertext: a patch masked by
+   * r, projected by weight w, comes out masked by w·r. Carrying that forward is
+   * what makes the embedding decryptable downstream.
    */
   homomorphicForward(
     encTensor: EncryptedImageTensor,
     projectionWeights: bigint[] = [3n, 7n, 11n]
-  ): { ciphertext: bigint; noise_level: number }[] {
-    const outputs: { ciphertext: bigint; noise_level: number }[] = [];
+  ): MaskedEmbedding[] {
+    const outputs: MaskedEmbedding[] = [];
 
     for (let i = 0; i < encTensor.ciphertexts.length; i++) {
-      const cPatch = { ciphertext: encTensor.ciphertexts[i], noise_level: 0 };
       const weight = projectionWeights[i % projectionWeights.length];
+      const patch = {
+        ring: "additive" as const,
+        ciphertext: encTensor.ciphertexts[i],
+        mask: encTensor.masks[i],
+      };
 
-      // Linear patch projection & scaling (W * x)
-      const cProjected = this.ops.scaleHomomorphic(cPatch, weight);
-      outputs.push(cProjected);
+      // Linear patch projection (W · x) — ciphertext and mask scale together.
+      const projected = this.ring.scalarMultiply(patch, weight);
+      outputs.push({ ciphertext: projected.ciphertext, mask: projected.mask, noise_level: 0 });
     }
 
     return outputs;
@@ -158,36 +194,53 @@ export class HomomorphicViTEncoder {
   /**
    * Homomorphically ground image embeddings against a CAS Scene Graph Motif Database.
    * Computes encrypted dot-product similarity over F_P.
+   *
+   * The dot product is a sum of scalings, and BOTH operations are linear in the
+   * mask, so the accumulated mask is exactly Σ vᵢ·maskᵢ. Subtracting it before
+   * decryption yields the true similarity — a quantity that depends only on the
+   * image and the motif, never on which random masks happened to be drawn.
+   *
+   * NOTE ON TRUST: this decrypts inside the encoder, which therefore holds the
+   * key. That is the pre-existing enclave shape of this class (see
+   * SecureEnclaveAgent). A deployment that does not trust the evaluator should
+   * return the masked accumulator and let the client decrypt — the algebra here
+   * is unchanged either way, since the mask is tracked explicitly.
    */
   groundSceneGraph(
-    encEmbeddings: { ciphertext: bigint; noise_level: number }[],
+    encEmbeddings: MaskedEmbedding[],
     motifDatabase: Map<string, { label: string; motif_vector: bigint[] }>
   ): SceneGraphMotifMatch[] {
     const results: SceneGraphMotifMatch[] = [];
 
     for (const [motifId, motifData] of motifDatabase.entries()) {
-      let accDot = this.fheEngine.encrypt(0n);
+      // Accumulator starts at an encryption of zero under a zero mask, so it is
+      // the additive identity in both the ciphertext and the mask.
+      let acc = { ring: "additive" as const, ciphertext: 0n, mask: 0n };
+
       for (let i = 0; i < encEmbeddings.length; i++) {
         const weight = motifData.motif_vector[i % motifData.motif_vector.length];
-        const scaled = this.ops.scaleHomomorphic(encEmbeddings[i], weight);
-        accDot = this.fheEngine.addHomomorphic(accDot, scaled);
+        const scaled = this.ring.scalarMultiply(
+          { ring: "additive", ciphertext: encEmbeddings[i].ciphertext, mask: encEmbeddings[i].mask },
+          weight,
+        );
+        acc = this.ring.add(acc, scaled);
       }
-      const dotPlain = this.fheEngine.decrypt(accDot);
+
       results.push({
         motif_id: motifId,
         motif_label: motifData.label,
-        similarity_score: dotPlain,
+        similarity_score: this.ring.decryptAdditive(acc, this.secretKey),
       });
     }
 
     return results.sort((a, b) => {
       if (b.similarity_score > a.similarity_score) return 1;
       if (b.similarity_score < a.similarity_score) return -1;
-      // Deterministic tie-break by motif id. Similarity is a dot product over
-      // F_137 — a 137-value space — so exact ties between motifs are COMMON
-      // rather than exotic, and `return 0` left the winner to iteration order.
-      // The top match then changed across identical runs, which is a ranking
-      // that cannot be verified. Ties now resolve on a stable key.
+      // Deterministic tie-break by motif id. `return 0` left tied motifs to
+      // iteration order, so the top match could change without the inputs
+      // changing — a ranking no downstream test can verify. Ties are rarer now
+      // that scores are true dot products over F_P rather than mask noise, but
+      // a stable key costs nothing and removes the whole class of ambiguity.
       return a.motif_id < b.motif_id ? -1 : a.motif_id > b.motif_id ? 1 : 0;
     });
   }
