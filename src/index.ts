@@ -48,3 +48,11 @@ export {
   type EncryptedImageTensor,
   type SceneGraphMotifMatch,
 } from "./vision-reasoning-engine";
+export {
+  ScientificReasoningCopilotClient,
+  CdclLeanBridge,
+  HomomorphicProofCertifier,
+  ScientificReasoningCopilot,
+  type EncryptedSymbolicInput,
+  type HomomorphicProofCertificate,
+} from "./scientific-reasoning-copilot";

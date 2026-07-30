@@ -147,15 +147,9 @@ export class HomomorphicViTEncoder {
       const cPatch = { ciphertext: encTensor.ciphertexts[i], noise_level: 0 };
       const weight = projectionWeights[i % projectionWeights.length];
 
-      // Step 1: Linear projection scalar scaling (W * x)
+      // Linear patch projection & scaling (W * x)
       const cProjected = this.ops.scaleHomomorphic(cPatch, weight);
-
-      // Step 2: 2nd-degree polynomial activation approximation (x^2 + 2x)
-      const cSquared = this.fheEngine.multiplyHomomorphic(cProjected, cProjected);
-      const cScaled2 = this.ops.scaleHomomorphic(cProjected, 2n);
-      const cActivated = this.fheEngine.addHomomorphic(cSquared, cScaled2);
-
-      outputs.push(cActivated);
+      outputs.push(cProjected);
     }
 
     return outputs;
