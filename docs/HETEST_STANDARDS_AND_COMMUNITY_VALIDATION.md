@@ -56,3 +56,12 @@ Key frameworks and community channels integrated:
 ## 3. Conclusion
 
 The $\mathbb{F}_{137}$ Prime-FHE primitive satisfies all testing vectors outlined by MIT Lincoln Lab's HEtest methodology, providing defense-grade correctness and nanosecond performance.
+
+---
+
+## License
+
+This document is licensed under the **Apache License, Version 2.0**.  
+Copyright 2026 Brad Wallace ([coo@koba42.com](mailto:coo@koba42.com)).  
+See [LICENSE](../LICENSE) for full terms.  
+Source: [github.com/tensorrent/prime-fhe](https://github.com/tensorrent/prime-fhe)

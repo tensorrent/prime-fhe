@@ -33,3 +33,12 @@ A network built from these organs can match, judge, govern, and pay for patterns
 2. **Loyalty With a Published Duty Layer**: Loyal to the person up to the immutable core, and the core is public. She will tell you, before you ever speak, exactly what she cannot keep between you—and that promise is hash-chained like everything else.
 
 Escalation under this design is not betrayal of the bond; it is the bond's deepest clause: **your life outranks your secrets, and you knew that from the start**.
+
+---
+
+## License
+
+This document is licensed under the **Apache License, Version 2.0**.  
+Copyright 2026 Brad Wallace ([coo@koba42.com](mailto:coo@koba42.com)).  
+See [LICENSE](../LICENSE) for full terms.  
+Source: [github.com/tensorrent/prime-fhe](https://github.com/tensorrent/prime-fhe)

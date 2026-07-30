@@ -60,3 +60,12 @@ No passive evaluator learns plaintext hashes $H_u$ or secret key $k$.
 
 1. **Single-Purpose Alert Tokens**: Matches emit alerts decryptable solely by designated public safety authorities.
 2. **Open-Source Auditability**: Reference implementation freely downloadable for public cryptographic audit (`git clone && npm test`).
+
+---
+
+## License
+
+This document is licensed under the **Apache License, Version 2.0**.  
+Copyright 2026 Brad Wallace ([coo@koba42.com](mailto:coo@koba42.com)).  
+See [LICENSE](../LICENSE) for full terms.  
+Source: [github.com/tensorrent/prime-fhe](https://github.com/tensorrent/prime-fhe)

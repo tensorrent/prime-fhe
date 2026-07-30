@@ -50,3 +50,12 @@ We present the **Unified Prime Thread Geometry over $\mathbb{F}_{137}$**, demons
 ## 3. Conclusion
 
 The prime thread is not merely a theoretical observation—it is a **universal geometric substrate** weaving together finite fields, quantum optics, molecular chemistry, autonomous AI, and noise-free homomorphic encryption.
+
+---
+
+## License
+
+This document is licensed under the **Apache License, Version 2.0**.  
+Copyright 2026 Brad Wallace ([coo@koba42.com](mailto:coo@koba42.com)).  
+See [LICENSE](../LICENSE) for full terms.  
+Source: [github.com/tensorrent/prime-fhe](https://github.com/tensorrent/prime-fhe)

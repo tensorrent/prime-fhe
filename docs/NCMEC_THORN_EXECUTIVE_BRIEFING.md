@@ -45,3 +45,12 @@ We present **Homomorphic Private Set Intersection (H-PSI)**, powered by the **Mo
 1. **Technical Briefing & Code Review**: Review our public repository (`https://github.com/tensorrent/Aiso`) and execute the automated 21/21 Vitest test suite (`git clone && npm test`).
 2. **Pilot Test Environment**: Deploy an isolated test node integrating official PDQ feature hash lists into an H-PSI zero-knowledge matcher pipeline.
 3. **Joint Standard Specification**: Establish an open industry standard for encrypted content safety reporting.
+
+---
+
+## License
+
+This document is licensed under the **Apache License, Version 2.0**.  
+Copyright 2026 Brad Wallace ([coo@koba42.com](mailto:coo@koba42.com)).  
+See [LICENSE](../LICENSE) for full terms.  
+Source: [github.com/tensorrent/prime-fhe](https://github.com/tensorrent/prime-fhe)

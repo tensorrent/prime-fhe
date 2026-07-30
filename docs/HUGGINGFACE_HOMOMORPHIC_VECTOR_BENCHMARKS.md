@@ -61,3 +61,12 @@ git clone https://github.com/tensorrent/prime-fhe.git
 cd prime-fhe
 python3 scratch/huggingface_fhe_benchmark.py
 ```
+
+---
+
+## License
+
+This document is licensed under the **Apache License, Version 2.0**.  
+Copyright 2026 Brad Wallace ([coo@koba42.com](mailto:coo@koba42.com)).  
+See [LICENSE](../LICENSE) for full terms.  
+Source: [github.com/tensorrent/prime-fhe](https://github.com/tensorrent/prime-fhe)

@@ -62,3 +62,12 @@ $$\text{Dec}(C, k) = (C - 1) \cdot k^{-1} \pmod{137}$$
 ## 3. Conclusion
 
 The $\mathbb{F}_{137}$ Prime Thread Homomorphic Engine provides a breakthrough alternative to traditional lattice FHE, offering **nanosecond-level encrypted multiplication latency** without the noise accumulation or bootstrapping barriers that plague existing industry libraries.
+
+---
+
+## License
+
+This document is licensed under the **Apache License, Version 2.0**.  
+Copyright 2026 Brad Wallace ([coo@koba42.com](mailto:coo@koba42.com)).  
+See [LICENSE](../LICENSE) for full terms.  
+Source: [github.com/tensorrent/prime-fhe](https://github.com/tensorrent/prime-fhe)

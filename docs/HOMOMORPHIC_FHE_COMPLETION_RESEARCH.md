@@ -73,3 +73,12 @@ Decryption executes via modular inverse multiplication in **constant $\mathcal{O
 ## 2. Master FHE Completion Verdict
 
 The $\mathbb{F}_{137}$ Prime Thread Homomorphic Scheme **fully qualifies as a complete, noise-free Fully Homomorphic Encryption (FHE) primitive** suitable for encrypted cloud AI inference and zero-knowledge state evaluation.
+
+---
+
+## License
+
+This document is licensed under the **Apache License, Version 2.0**.  
+Copyright 2026 Brad Wallace ([coo@koba42.com](mailto:coo@koba42.com)).  
+See [LICENSE](../LICENSE) for full terms.  
+Source: [github.com/tensorrent/prime-fhe](https://github.com/tensorrent/prime-fhe)

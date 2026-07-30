@@ -87,3 +87,12 @@ $$I(m ; \rho_C) = S(\rho_C) - S(\rho_C \mid m) = 256 - 256 = 0 \text{ bits} \qua
 ## 4. Conclusion
 
 MA-HP provides **Post-Quantum Information-Theoretic Secrecy** without sacrificing speed. By avoiding high-dimensional lattice polynomial ring reductions while retaining $2^{128}$ quantum work factor bounds, MA-HP represents a ultra-fast, post-quantum secure homomorphic evaluation primitive.
+
+---
+
+## License
+
+This document is licensed under the **Apache License, Version 2.0**.  
+Copyright 2026 Brad Wallace ([coo@koba42.com](mailto:coo@koba42.com)).  
+See [LICENSE](../LICENSE) for full terms.  
+Source: [github.com/tensorrent/prime-fhe](https://github.com/tensorrent/prime-fhe)

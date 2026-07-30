@@ -123,3 +123,12 @@ This manuscript presents Modular Affine Masked Homomorphic Protocols (MA-HP) as 
 **Open Research Directions for External Cryptanalysis**:
 1. Characterizing multi-session correlation bounds across $10^6$ repeated blinded evaluation handles.
 2. Formalizing security reductions for noisy affine extensions under Learning With Errors (LWE) hardness assumptions over $\mathbb{F}_P$.
+
+---
+
+## License
+
+This document is licensed under the **Apache License, Version 2.0**.  
+Copyright 2026 Brad Wallace ([coo@koba42.com](mailto:coo@koba42.com)).  
+See [LICENSE](../LICENSE) for full terms.  
+Source: [github.com/tensorrent/prime-fhe](https://github.com/tensorrent/prime-fhe)
