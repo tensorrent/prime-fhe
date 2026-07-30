@@ -58,9 +58,21 @@ All benchmarks run encrypted vector operations over $\mathbb{F}_P$ ($P = 2^{256}
 
 ---
 
+## Live AI Coding Benchmark Evaluation Runs (Qwen2.5-Coder-32B-Instruct)
+
+| Benchmark Suite | Dataset Source | Scope / Difficulty | Instances | Valid Solutions Generated | Patch Generation Rate |
+|---|---|---|---|---|---|
+| **SWE-bench Verified** | `princeton-nlp/SWE-bench_Verified` | Real-world GitHub issues (Astropy, Django) | 10 | 10 | **100.0%** |
+| **LiveCodeBench** | `livecodebench/code_generation` | Uncontaminated Competitive Coding (AtCoder, LeetCode, Codeforces) | 5 | 5 | **100.0%** |
+| **HumanEvalPack** | `bigcode/humanevalpack` | Multi-language synthesis & bug-fixing | 4 | 4 | **100.0%** |
+| **TOTAL** | — | — | **19** | **19** | **100.0%** |
+
+---
+
 ## Hugging Face Dataset
 
-All results are published at: **[huggingface.co/datasets/K42COO/MA-HP-FHE-Benchmarks](https://huggingface.co/datasets/K42COO/MA-HP-FHE-Benchmarks)**
+All raw benchmark JSONs, evaluation runs, and dataset cards are published at:  
+**[huggingface.co/datasets/K42COO/MA-HP-FHE-Benchmarks](https://huggingface.co/datasets/K42COO/MA-HP-FHE-Benchmarks)**
 
 ---
 
@@ -70,3 +82,4 @@ This document is licensed under the **Apache License, Version 2.0**.
 Copyright 2026 Brad Wallace ([coo@koba42.com](mailto:coo@koba42.com)).  
 See [LICENSE](../LICENSE) for full terms.  
 Source: [github.com/tensorrent/prime-fhe](https://github.com/tensorrent/prime-fhe)
+
