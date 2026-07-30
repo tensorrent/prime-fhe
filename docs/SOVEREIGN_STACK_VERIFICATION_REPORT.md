@@ -60,15 +60,15 @@ All benchmarks run encrypted vector operations over $\mathbb{F}_P$ ($P = 2^{256}
 
 ## Live AI Coding Benchmark Evaluation Runs (Qwen2.5-Coder Engine + AISO DSL Solver)
 
-| Benchmark Suite | Dataset Source | Scope / Difficulty | Executed Tasks | Valid Solutions Generated | Generation Rate / Accuracy |
-|---|---|---|---|---|---|
-| **ARC Prize 2026 (DSL Solver)** | `fchollet/ARC` (Official Repo) | AGI Fluid Intelligence & Spatial Reasoning | 10 | 1 (Exact Match) | **10.0% (Sub-second)** |
-| **EvalPlus HumanEval+ (50-Task Batch)** | `evalplus/humanevalplus` | 80× Adversarial Edge-Case Test Cases | 50 | 50 | **100.0%** |
-| **EvalPlus MBPP+ (50-Task Batch)** | `evalplus/mbppplus` | 100× Adversarial Edge-Case Test Cases | 50 | 50 | **100.0%** |
-| **SWE-bench Verified** | `princeton-nlp/SWE-bench_Verified` | Real-world GitHub issues (Astropy, Django) | 10 | 10 | **100.0%** |
-| **LiveCodeBench HARD** | `livecodebench/code_generation` | Hard Competitive Coding (AtCoder / Codeforces) | 5 | 5 | **100.0%** |
-| **HumanEvalPack** | `bigcode/humanevalpack` | Multi-language synthesis & bug-fixing | 4 | 4 | **100.0%** |
-| **TOTAL** | — | — | **129** | **120** | **93.0%** |
+| Benchmark Suite | Dataset Source | Scope / Difficulty | Executed Tasks | Valid Solutions Generated | Solve / Pass Rate | Avg Latency |
+|---|---|---|---|---|---|---|
+| **ARC-AGI-1 Full Sweep** | `fchollet/ARC` (Official Repo) | Full 400-Task AGI Spatial Reasoning | **400** | **11 (Exact Matches)** | **2.75%** | **157.5 ms** |
+| **EvalPlus HumanEval+ (50-Task Batch)** | `evalplus/humanevalplus` | 80× Adversarial Edge-Case Test Cases | 50 | 50 | **100.0%** | 2.80s |
+| **EvalPlus MBPP+ (50-Task Batch)** | `evalplus/mbppplus` | 100× Adversarial Edge-Case Test Cases | 50 | 50 | **100.0%** | 7.50s |
+| **SWE-bench Verified** | `princeton-nlp/SWE-bench_Verified` | Real-world GitHub issues (Astropy, Django) | 10 | 10 | **100.0%** | 7.73s |
+| **LiveCodeBench HARD** | `livecodebench/code_generation` | Hard Competitive Coding (AtCoder / Codeforces) | 5 | 5 | **100.0%** | 8.48s |
+| **HumanEvalPack** | `bigcode/humanevalpack` | Multi-language synthesis & bug-fixing | 4 | 4 | **100.0%** | 4.45s |
+| **CUMULATIVE TOTAL** | — | — | **519** | **130** | — | — |
 
 ---
 
@@ -84,8 +84,8 @@ Every core component of the Sovereign Stack now has a dedicated dataset reposito
    - CUDA-to-Rust native translation bridge, 1024-dim encrypted vector evaluation (1.42 ms).
 4. 🔌 **SparsePlug Compression**: **[huggingface.co/datasets/K42COO/SparsePlug-Compression-Benchmarks](https://huggingface.co/datasets/K42COO/SparsePlug-Compression-Benchmarks)**
    - Hardware-adaptive sparsity profiler, TrinityWasm compression (< 1% degradation at 90% sparsity).
-5. 🏆 **ARC Prize 2026 DSL Solver**: **[huggingface.co/datasets/K42COO/MA-HP-FHE-Benchmarks](https://huggingface.co/datasets/K42COO/MA-HP-FHE-Benchmarks)**
-   - AISO Boxel grid topology + DSL program synthesis run on official `fchollet/ARC` training dataset.
+5. 🧩 **Full ARC-1 400-Task Sweep**: **[huggingface.co/datasets/K42COO/MA-HP-FHE-Benchmarks](https://huggingface.co/datasets/K42COO/MA-HP-FHE-Benchmarks)**
+   - Full 400-task ARC-1 sweep (`benchmarks/arc1_full_sweep_results.json`) — 11 exact matches in 63 seconds.
 
 ---
 
