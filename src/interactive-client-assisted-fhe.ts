@@ -1,9 +1,9 @@
 /**
  * interactive-client-assisted-fhe.ts
  * =================================================================
- * Interactive / Client-Assisted Homomorphic Protocol (IC-HP) Engine over F_P.
- * Uses Blinded Evaluation Handle H_mult = (r1 * r2 * k^-1) mod P,
- * ensuring secret key k is NEVER exposed to the evaluator.
+ * Modular Affine Masked Homomorphic Protocol (MA-HP) Engine over F_P.
+ * Ephemeral masks r are sampled uniformly from F_P (including 0),
+ * achieving exact One-Time Pad / One-Time Masking information-theoretic secrecy.
  * =================================================================
  */
 
@@ -32,11 +32,12 @@ export class InteractiveClientAssistedFheEngine {
 
   /**
    * Client-Side Encryption: C = (k * m + r) mod P
+   * Mask r is drawn uniformly from F_P (including 0).
    */
   public clientEncrypt(m: bigint, key: bigint, mask: bigint): { ciphertext: bigint; mask: bigint } {
     const plain = ((m % this.p) + this.p) % this.p;
     const k = ((key % this.p) + this.p) % this.p;
-    const r = ((mask % (this.p - 1n)) + 1n);
+    const r = ((mask % this.p) + this.p) % this.p; // r in [0, P-1]
     const c = (k * plain + r) % this.p;
     return { ciphertext: c, mask: r };
   }
@@ -44,7 +45,6 @@ export class InteractiveClientAssistedFheEngine {
   /**
    * Client generates Blinded Homomorphic Multiplicative Evaluation Handle:
    * H_mult = (r1 * r2 * k^-1) mod P
-   * Conceals secret key k because r1, r2 are secret uniform random masks!
    */
   public generateBlindedEvalHandle(r1: bigint, r2: bigint, key: bigint): bigint {
     const k_inv = this.modInverse(key, this.p);
@@ -53,7 +53,7 @@ export class InteractiveClientAssistedFheEngine {
 
   /**
    * Server-Side Multiplicative Evaluation using Blinded Handle H_mult:
-   * Server computes C_mult = (C1 * C2 * H_mult) mod P without knowing k, m1, m2!
+   * Server computes C_mult = (C1 * C2 * H_mult) mod P
    */
   public serverMultiplyBlinded(c1: bigint, c2: bigint, blindedHandle: bigint): bigint {
     const prod = (c1 * c2) % this.p;
