@@ -41,3 +41,10 @@ export {
   type EncryptedResponse,
   type HomomorphicTestHarness,
 } from "./unified-private-ai-platform";
+export {
+  VisionReasoningEngineClient,
+  HomomorphicViTEncoder,
+  VisionReasoningEngine,
+  type EncryptedImageTensor,
+  type SceneGraphMotifMatch,
+} from "./vision-reasoning-engine";
