@@ -56,3 +56,12 @@ export {
   type EncryptedSymbolicInput,
   type HomomorphicProofCertificate,
 } from "./scientific-reasoning-copilot";
+export {
+  EncryptedInterAgentChannel,
+  CdclTaskManager,
+  HomomorphicVotingEngine,
+  MultiAgentOrchestrationFabric,
+  type EncryptedInterAgentMessage,
+  type AgentSubtask,
+  type EncryptedBallot,
+} from "./multi-agent-orchestration-fabric";
