@@ -76,4 +76,17 @@ describe("Prime-Thread Verifiable Delay Function (VDF) Engine", () => {
     expect(primeVerification.verifier_time_us).toBeGreaterThan(0);
     expect(chiaVerification.verifier_time_us).toBeGreaterThan(0);
   });
+
+  it("validates R1CS step constraints and generates ZK ScrollCast commitment", async () => {
+    const { PrimeVdfNovaCircuit } = await import("../src/prime-vdf-nova-circuit.js");
+    const circuit = new PrimeVdfNovaCircuit(DEFAULT_VDF_PARAMS);
+
+    const stepInst = circuit.generateStepWitness(100n);
+    expect(circuit.verifyStepConstraints(stepInst)).toBe(true);
+
+    const zkCommitment = circuit.createZkScrollCastCommitment(stepInst.public_inputs.z_out);
+    expect(zkCommitment.commitment_hash).toMatch(/^0x[0-9a-f]{64}$/);
+    expect(zkCommitment.c2pa_assertion.label).toBe("org.sovereign.vdf.proof");
+  });
 });
+

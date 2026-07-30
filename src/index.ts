@@ -27,4 +27,10 @@ export {
   type PrimeVdfProof,
   type PrimeVdfVerificationResult,
 } from "./prime-vdf-engine";
+export {
+  PrimeVdfNovaCircuit,
+  type R1csStepInstance,
+  type ZkScrollCastCommitment,
+} from "./prime-vdf-nova-circuit";
+
 
