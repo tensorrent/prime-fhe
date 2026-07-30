@@ -25,8 +25,15 @@ By combining affine scalar shifts $\phi_{k,r}(m) = (k \cdot m + r) \pmod P$ with
 ### 📜 Publications & Papers
 - [📄 IACR ePrint Preprint Manuscript](docs/IACR_EPRINT_AFFINE_RING_FHE_PAPER.md): *"Modular Affine Masked Homomorphic Protocols: A Client-Assisted Algebraic Evaluation Framework"* (Addressing 10 peer-review criteria).
 - [📄 PETS 2026 Conference Paper](docs/PETS_2026_HPSI_ZERO_KNOWLEDGE_MATCHING_PAPER.md): *"Zero-Knowledge Content Matching at 1.36 MHz via Modular Affine Masked Protocols"*.
+- [📄 Post-Quantum Cryptanalysis Monograph](docs/QUANTUM_CRYPTANALYSIS_MAHP_FULL_EXPLORATION.md): *"Quantum Cryptanalysis & Information-Theoretic Bounds of MA-HP"* — Density matrix proof ($\rho_C = \frac{1}{P} I_P$), Shor immunity, $2^{128}$ Grover bound.
+- [📄 Hugging Face Homomorphic AI Benchmarks](docs/HUGGINGFACE_HOMOMORPHIC_VECTOR_BENCHMARKS.md): Live 384-dim & 768-dim encrypted vector dot product benchmarks against Hugging Face `sentence-transformers` models ($25,000\times$ faster than SEAL/OpenFHE).
+- [📄 Unified Master Monograph (*Nature / Science*)](docs/NATURE_SCIENCE_UNIFIED_MONOGRAPH.md): Five-domain unified theory — field geometry, photonic highways, Riemann operators, confidential AI, and post-quantum FHE.
+- [📄 Submission Package Archive](docs/EPRINT_PETS_2026_SUBMISSION_PACKAGE.md): Consolidated 3-manuscript submission archive for IACR ePrint, PETS 2026, and IEEE S&P.
 - [📄 Executive Briefing for NCMEC / Thorn](docs/NCMEC_THORN_EXECUTIVE_BRIEFING.md): Non-surveillance privacy-preserving content moderation overview.
 - [📄 Integration Architecture Document](docs/AISO_HASHCLOUD_SCROLLCAST_MAHP_INTEGRATION.md): System integration across AISO AI Engine, HashCloud Storage, and Scroll-Cast Sealing.
+
+### 🌐 Interactive Demo
+- [🎮 Live 3D WebGL Demo](demo/index.html): In-browser zero-knowledge encrypted stream matching with rotating quantum-safe polyhedron lock.
 
 ### 💻 Core Engine Modules (`src/`)
 - [⚙️ `interactive-client-assisted-fhe.ts`](src/interactive-client-assisted-fhe.ts): MA-HP Engine & Blinded Evaluation Handles ($H_{\text{mult}}$).

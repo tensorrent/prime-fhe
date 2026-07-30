@@ -72,15 +72,21 @@ describe("MA-HP Protocol (IACR ePrint 2026)", () => {
   // Theorem 4: Blinded handle secrecy
   // H = r1·r2·k⁻¹ mod P — client-retained r1, r2 blind k
   it("Theorem 4: Blinded handle conceals secret key without client secrets", () => {
+    const P137 = 137n;
+    const modInv137 = (a: bigint): bigint => {
+      let b = ((a % P137) + P137) % P137, e = P137 - 2n, r = 1n;
+      while (e > 0n) { if (e & 1n) r = (r * b) % P137; b = (b * b) % P137; e >>= 1n; }
+      return r;
+    };
     const k = 17n;
-    const ki = modInv(k) % 137n;
+    const ki = modInv137(k);
     const r1 = 42n, r2 = 99n;
-    const H = (r1 * r2 * ki) % 137n;
+    const H = (r1 * r2 * ki) % P137;
 
     // Without r1, r2, H alone reveals nothing about k
     // But if r1, r2 are leaked, k is recoverable
-    const r1r2_inv = modInv((r1 * r2) % 137n);
-    const recovered_ki = (H * r1r2_inv) % 137n;
+    const r1r2_inv = modInv137((r1 * r2) % P137);
+    const recovered_ki = (H * r1r2_inv) % P137;
     expect(recovered_ki).toBe(ki); // recoverable only with r1, r2
   });
 });
