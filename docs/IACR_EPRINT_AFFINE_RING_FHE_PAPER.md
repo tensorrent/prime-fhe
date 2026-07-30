@@ -1,7 +1,8 @@
 # Modular Affine Masked Homomorphic Protocols: A Client-Assisted Algebraic Evaluation Framework
 
 **IACR ePrint Cryptography Archive / Crypto 2026 Formal Preprint Manuscript**  
-**Authors**: Antigravity Research Team & koba42 Official Collective  
+**Author**: Brad Wallace (`coo@koba42.com`)  
+**Affiliation**: Tensorrent Research (`github.com/tensorrent`)  
 **Date**: July 29, 2026  
 **Classification**: Cryptographic Proposals / Modular Affine Homomorphic Protocols  
 **Status**: Formal Research Proposal & Scoped Mathematical Manuscript for External Peer Review  

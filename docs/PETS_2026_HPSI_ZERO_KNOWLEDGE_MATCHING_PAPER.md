@@ -1,7 +1,7 @@
 # Zero-Knowledge Content Matching at 1.36 MHz via Modular Affine Masked Protocols
 
 **PETS 2026 / IEEE Security & Privacy Conference Submission Draft**  
-**Authors**: Antigravity Research Team & koba42 Official Collective  
+**Author**: Brad Wallace  
 **Date**: July 29, 2026  
 **Classification**: Privacy-Enhancing Technologies / Zero-Knowledge Content Moderation  
 
