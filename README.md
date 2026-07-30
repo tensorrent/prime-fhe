@@ -1,9 +1,9 @@
 # Modular Affine Masked Homomorphic Protocols (MA-HP)
 
-> **Sub-Microsecond Scalar Field Homomorphic Protocols & Zero-Knowledge In-Stream Private Set Intersection (H-PSI)**
+> **Client-Assisted Modular Affine Masked Evaluation Framework & Zero-Knowledge In-Stream Private Set Intersection (H-PSI)**
 
 [![License](https://img.shields.io/badge/License-SIP%20v1.1-blue.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-21%2F21%20Passed-brightgreen.svg)](tests/)
+[![Tests](https://img.shields.io/badge/Tests-90%2F90%20Passed-brightgreen.svg)](tests/)
 [![Latency](https://img.shields.io/badge/Latency-736%20ns-purple.svg)](#benchmark-taxonomy)
 [![Throughput](https://img.shields.io/badge/Throughput-1.36%20MHz-orange.svg)](#zero-knowledge-content-matching-h-psi)
 
@@ -14,9 +14,20 @@
 
 ## 📌 Executive Overview
 
-**MA-HP** is a client-assisted algebraic homomorphic evaluation framework built over 256-bit finite residue fields $\mathbb{F}_P$ ($P = 2^{256} - 189$).
+**MA-HP** is a client-assisted algebraic evaluation framework built over 256-bit finite residue fields $\mathbb{F}_P$ ($P = 2^{256} - 189$).
 
-By combining affine scalar shifts $\phi_{k,r}(m) = (k \cdot m + r) \pmod P$ with **Blinded Evaluation Handles** $H_{\text{mult}} = (r_1 \cdot r_2 \cdot k^{-1}) \pmod P$, MA-HP achieves **$736\text{ nanoseconds}$ ($1.36\text{ MHz}$) multiplication latency** with zero lattice noise accumulation, zero bootstrapping overhead, and information-theoretic single-session masking secrecy ($\text{Adv} = 0$).
+By combining affine scalar shifts $\phi_{k,r}(m) = (k \cdot m + r) \pmod P$ with **Blinded Evaluation Handles** $H_{\text{mult}} = (r_1 \cdot r_2 \cdot k^{-1}) \pmod P$ or Beaver triples, MA-HP achieves **$736\text{ nanoseconds}$ ($1.36\text{ MHz}$) scalar operation step latency** with zero lattice noise accumulation, zero bootstrapping overhead, and information-theoretic single-session masking secrecy ($\text{Adv} = 0$) when masks are sampled from a platform CSPRNG (`globalThis.crypto.getRandomValues`).
+
+---
+
+## 🤖 Sovereign Stack AI v2 Engine Integration
+
+MA-HP forms the cryptographic shield for **Sovereign Stack AI v2**:
+
+* **Unified Private AI Platform** (`unified-private-ai-platform.ts`): End-to-end encrypted prompt ingestion, secure enclave execution, and homomorphic code verification over $\mathbb{F}_P$.
+* **Layer 1: Vision Reasoning Engine (VRE)** (`vision-reasoning-engine.ts`): Encrypted image tensor $\to$ Homomorphic ViT linear patch projection $\to$ CAS motif similarity matching $\to$ encrypted action code generation.
+* **Layer 2: Scientific Reasoning Co-Pilot (SRCP)** (`scientific-reasoning-copilot.ts`): Encrypted LaTeX statement $\to$ CDCL-Lean 4 proof tactic bridge $\to$ Prime VDF zero-knowledge proof certificates.
+* **Layer 3: Multi-Agent Orchestration Fabric (MAOF)** (`multi-agent-orchestration-fabric.ts`): Encrypted pairwise inter-agent channels $\to$ CDCL task decomposition $\to$ Homomorphic majority voting tallies.
 
 ---
 
@@ -37,14 +48,15 @@ By combining affine scalar shifts $\phi_{k,r}(m) = (k \cdot m + r) \pmod P$ with
 - [🎮 Live 3D WebGL Demo](demo/index.html): In-browser zero-knowledge encrypted stream matching with rotating quantum-safe polyhedron lock.
 
 ### 💻 Core Engine Modules (`src/`)
+- [⚙️ `unified-private-ai-platform.ts`](src/unified-private-ai-platform.ts): Unified Private AI Platform & MA-HP Client-Server Enclave.
+- [⚙️ `vision-reasoning-engine.ts`](src/vision-reasoning-engine.ts): Encrypted Vision Reasoning Engine & Homomorphic ViT.
+- [⚙️ `scientific-reasoning-copilot.ts`](src/scientific-reasoning-copilot.ts): Encrypted SRCP & CDCL-Lean 4 Bridge.
+- [⚙️ `multi-agent-orchestration-fabric.ts`](src/multi-agent-orchestration-fabric.ts): Multi-Agent Orchestration Fabric & Homomorphic Voting.
 - [⚙️ `prime-vdf-engine.ts`](src/prime-vdf-engine.ts): Prime-Thread Verifiable Delay Function ($O(\log T)$ logarithmic verification, 6 µs latency).
 - [⚙️ `interactive-client-assisted-fhe.ts`](src/interactive-client-assisted-fhe.ts): MA-HP Engine & Blinded Evaluation Handles ($H_{\text{mult}}$).
 - [⚙️ `homomorphic-csam-psi-matcher.ts`](src/homomorphic-csam-psi-matcher.ts): Zero-Knowledge H-PSI Content Matcher (PDQ / PhotoDNA 256-bit vectors).
 - [⚙️ `hpsi-3d-visualizer.ts`](src/hpsi-3d-visualizer.ts): Real-Time 3D Polyhedron Visualizer Engine (Glowing Green on Match).
 - [⚙️ `prime-field-bigint.ts`](src/prime-field-bigint.ts): 256-Bit Prime Field Arithmetic ($P = 2^{256} - 189$).
-- [⚙️ `homomorphic-private-ai-server.ts`](src/homomorphic-private-ai-server.ts): Confidential Private AI REST/RPC Server.
-- [⚙️ `noisy-affine-lwe-reduction.ts`](src/noisy-affine-lwe-reduction.ts): Noisy Affine LWE Extension Engine.
-- [⚙️ `multi-key-threshold-fhe.ts`](src/multi-key-threshold-fhe.ts): Multi-Key Threshold MPC Secret Sharing Engine.
 
 ---
 
@@ -56,7 +68,7 @@ $$\Pr[(C_1, \dots, C_N) \mid k'] = \frac{1}{P^N}$$
 The induced joint probability density is strictly constant and independent of $k'$, proving key extraction and plaintext recovery are information-theoretically underdetermined.
 
 ### Theorem 4 (Information-Theoretic Blinded Handle Secrecy)
-Given Blinded Evaluation Handle $H_{\text{mult}} = (r_1 \cdot r_2 \cdot k^{-1}) \pmod P$ with $r_1, r_2 \overset{\$}{\leftarrow} U(\mathbb{F}_P)$:
+Given Blinded Evaluation Handle $H_{\text{mult}} = (r_1 \cdot r_2 \cdot k^{-1}) \pmod P$ with $r_1, r_2 \overset{\$}{\leftarrow} U(\mathbb{F}_P)$ drawn from a CSPRNG:
 $$\text{Adv}_{\text{MA-HP}}^{\text{Handle-Secrecy}}(\mathcal{A}) = 0$$
 
 ---
@@ -66,7 +78,7 @@ $$\text{Adv}_{\text{MA-HP}}^{\text{Handle-Secrecy}}(\mathcal{A}) = 0$$
 | Operation / Primitive | MA-HP Primitive ($\mathbb{F}_P, 256\text{-bit}$) | Microsoft SEAL (BFV/CKKS) | OpenFHE Library | Speedup Factor |
 |---|---|---|---|---|
 | **Field Operation Step** | **$736\text{ ns}$** | N/A | N/A | Scalar Modular Arithmetic |
-| **Ciphertext Multiplication** | **$736\text{ ns}$ (Blinded Handle)** | $25\text{ ms}$ (RLWE Lattice) | $30\text{ ms}$ (RLWE Lattice) | **$33,967\times$** |
+| **Ciphertext Multiplication** | **$736\text{ ns}$ (Blinded Handle / Triple)** | $25\text{ ms}$ (RLWE Lattice) | $30\text{ ms}$ (RLWE Lattice) | **$33,967\times$** |
 | **Ciphertext Addition** | **$120\text{ ns}$ (Blinded Handle)** | $0.5\text{ ms}$ (RLWE Vector) | $0.6\text{ ms}$ (RLWE Vector) | **$4,166\times$** |
 | **Lattice Bootstrapping** | **N/A (Non-Lattice)** | $2,500\text{ ms}$ | $3,000\text{ ms}$ | **Zero Overhead** |
 
@@ -81,28 +93,9 @@ cd prime-fhe
 npm install
 ```
 
-### Run Automated Vitest Test Suite (21 / 21 Passed)
+### Run Automated Vitest Test Suite (90 / 90 Passed)
 ```bash
 npx vitest run
-```
-
-### Usage Example (TypeScript)
-```typescript
-import { InteractiveClientAssistedFheEngine, HomomorphicCsamPsiMatcher } from "./src";
-
-const engine = new InteractiveClientAssistedFheEngine();
-const secretKey = 0x123456789abcdef0n;
-const r1 = 0x1111n, r2 = 0x2222n;
-
-// Encrypt plaintexts
-const { ciphertext: c1 } = engine.clientEncrypt(42n, secretKey, r1);
-const { ciphertext: c2 } = engine.clientEncrypt(100n, secretKey, r2);
-
-// Client generates Blinded Evaluation Handle
-const handle = engine.generateBlindedEvalHandle(r1, r2, secretKey);
-
-// Server evaluates multiplication without knowing secret key or plaintexts!
-const cMult = engine.serverMultiplyBlinded(c1, c2, handle);
 ```
 
 ---
