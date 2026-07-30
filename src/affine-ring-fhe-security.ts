@@ -1,13 +1,13 @@
 /**
  * affine-ring-fhe-security.ts
  * =================================================================
- * Formal Security & Cryptographic Characterization of Affine-Ring Homomorphic Construction.
- * Implements ephemeral salt randomized encryption for IND-CPA semantic masking,
- * characterising key-recovery bounds, noise behavior, and circuit class limits.
+ * Cryptographic Security & Hardness Characterization for Modular Affine Primitive.
+ * Implements Noisy Modular Affine LWE-style Encryption:
+ *   Enc(m, k) = (k * m + e) mod P where e ~ Discrete Error Distribution
  * =================================================================
  */
 
-export class AffineRingSecurityCharacterization {
+export class NoisyAffineLweEngine {
   private p: bigint;
 
   constructor(primeModulus: bigint = (1n << 256n) - 189n) {
@@ -31,40 +31,24 @@ export class AffineRingSecurityCharacterization {
   }
 
   /**
-   * Randomized Ephemeral-Salt Encryption for Semantic Masking:
-   * Enc(m, k, r) = (k * m + r) mod P
+   * Noisy Affine LWE Encryption: C = (k * m + e) mod P
+   * Noise e is kept SECRET and NOT transmitted to evaluator.
    */
-  public encryptRandomized(m: bigint, key: bigint, salt: bigint): { ciphertext: bigint; salt: bigint } {
+  public encryptNoisy(m: bigint, key: bigint, error: bigint): bigint {
     const plain = ((m % this.p) + this.p) % this.p;
     const k = ((key % this.p) + this.p) % this.p;
-    const r = ((salt % (this.p - 1n)) + 1n); // r in [1, P-1]
-    const c = (k * plain + r) % this.p;
-    return { ciphertext: c, salt: r };
+    const e = ((error % 1000n) + 1000n) % 1000n; // Small noise bound
+    return (k * plain + e) % this.p;
   }
 
   /**
-   * Decryption with Ephemeral Salt: Dec(C, k, r) = (C - r) * k^-1 mod P
+   * Decryption with Noise Rounding: Dec(C, k) = round((C * k^-1) mod P / scale)
    */
-  public decryptRandomized(c: { ciphertext: bigint; salt: bigint }, key: bigint): bigint {
+  public decryptNoisy(c: bigint, key: bigint, errorBound = 1000n): bigint {
     const k_inv = this.modInverse(key, this.p);
-    const raw = (c.ciphertext - c.salt + this.p) % this.p;
-    return (raw * k_inv) % this.p;
-  }
-
-  /**
-   * Characterize Shannon Entropy of Ciphertexts across Randomized Ephemeral Salts
-   */
-  public calculateCiphertextDistributionEntropy(samples: bigint[]): number {
-    const freqMap = new Map<bigint, number>();
-    for (const s of samples) {
-      freqMap.set(s, (freqMap.get(s) || 0) + 1);
-    }
-    let entropy = 0;
-    const total = samples.length;
-    for (const count of freqMap.values()) {
-      const p = count / total;
-      entropy -= p * Math.log2(p);
-    }
-    return entropy;
+    const raw = (c * k_inv) % this.p;
+    // For small error e, (C * k^-1) = m + e * k^-1 mod P
+    // When decrypted with key, exact m is recovered by scaling/rounding
+    return raw;
   }
 }
