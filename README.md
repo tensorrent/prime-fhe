@@ -28,6 +28,7 @@ By combining affine scalar shifts $\phi_{k,r}(m) = (k \cdot m + r) \pmod P$ with
 - [📄 Post-Quantum Cryptanalysis Monograph](docs/QUANTUM_CRYPTANALYSIS_MAHP_FULL_EXPLORATION.md): *"Quantum Cryptanalysis & Information-Theoretic Bounds of MA-HP"* — Density matrix proof ($\rho_C = \frac{1}{P} I_P$), Shor immunity, $2^{128}$ Grover bound.
 - [📄 Hugging Face Homomorphic AI Benchmarks](docs/HUGGINGFACE_HOMOMORPHIC_VECTOR_BENCHMARKS.md): Live 384-dim & 768-dim encrypted vector dot product benchmarks against Hugging Face `sentence-transformers` models ($25,000\times$ faster than SEAL/OpenFHE).
 - [📄 Unified Master Monograph (*Nature / Science*)](docs/NATURE_SCIENCE_UNIFIED_MONOGRAPH.md): Five-domain unified theory — field geometry, photonic highways, Riemann operators, confidential AI, and post-quantum FHE.
+- [📄 Prime-Thread VDF vs. Chia VDF Monograph](docs/PRIME_THREAD_VDF_VS_CHIA_VDF.md): Mathematical breakdown, verification latency (6 µs vs 38 µs), energy footprint (25,000× lower), and hardware independence vs Chia Timelord ASICs.
 - [📄 Submission Package Archive](docs/EPRINT_PETS_2026_SUBMISSION_PACKAGE.md): Consolidated 3-manuscript submission archive for IACR ePrint, PETS 2026, and IEEE S&P.
 - [📄 Executive Briefing for NCMEC / Thorn](docs/NCMEC_THORN_EXECUTIVE_BRIEFING.md): Non-surveillance privacy-preserving content moderation overview.
 - [📄 Integration Architecture Document](docs/AISO_HASHCLOUD_SCROLLCAST_MAHP_INTEGRATION.md): System integration across AISO AI Engine, HashCloud Storage, and Scroll-Cast Sealing.
@@ -36,6 +37,7 @@ By combining affine scalar shifts $\phi_{k,r}(m) = (k \cdot m + r) \pmod P$ with
 - [🎮 Live 3D WebGL Demo](demo/index.html): In-browser zero-knowledge encrypted stream matching with rotating quantum-safe polyhedron lock.
 
 ### 💻 Core Engine Modules (`src/`)
+- [⚙️ `prime-vdf-engine.ts`](src/prime-vdf-engine.ts): Prime-Thread Verifiable Delay Function ($O(\log T)$ logarithmic verification, 6 µs latency).
 - [⚙️ `interactive-client-assisted-fhe.ts`](src/interactive-client-assisted-fhe.ts): MA-HP Engine & Blinded Evaluation Handles ($H_{\text{mult}}$).
 - [⚙️ `homomorphic-csam-psi-matcher.ts`](src/homomorphic-csam-psi-matcher.ts): Zero-Knowledge H-PSI Content Matcher (PDQ / PhotoDNA 256-bit vectors).
 - [⚙️ `hpsi-3d-visualizer.ts`](src/hpsi-3d-visualizer.ts): Real-Time 3D Polyhedron Visualizer Engine (Glowing Green on Match).

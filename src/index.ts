@@ -18,3 +18,13 @@ export { MultiKeyThresholdFheEngine } from "./multi-key-threshold-fhe";
 export { AffineRingFheSecurityEngine } from "./affine-ring-fhe-security";
 export { HomomorphicCsamPsiMatcher } from "./homomorphic-csam-psi-matcher";
 export { Hpsi3dVisualizerEngine } from "./hpsi-3d-visualizer";
+export {
+  PrimeVdfProver,
+  PrimeVdfVerifier,
+  ChiaVdfSimulator,
+  DEFAULT_VDF_PARAMS,
+  type PrimeVdfParams,
+  type PrimeVdfProof,
+  type PrimeVdfVerificationResult,
+} from "./prime-vdf-engine";
+
