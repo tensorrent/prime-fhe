@@ -32,5 +32,12 @@ export {
   type R1csStepInstance,
   type ZkScrollCastCommitment,
 } from "./prime-vdf-nova-circuit";
-
-
+export {
+  UnifiedPrivateAIPlatformClient,
+  SecureEnclaveAgent,
+  stringToFieldElement,
+  fieldElementToString,
+  type EncryptedPrompt,
+  type EncryptedResponse,
+  type HomomorphicTestHarness,
+} from "./unified-private-ai-platform";
