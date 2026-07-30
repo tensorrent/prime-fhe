@@ -2,7 +2,7 @@
  * index.ts
  * =================================================================
  * Main entry point for @tensorrent/prime-fhe-mobius-engine.
- * Exports MA-HP engines, H-PSI content matchers, 256-bit BigInt field arithmetic, and Private AI servers.
+ * Exports MA-HP engines, H-PSI matchers, 3D visualizers, 256-bit BigInt field arithmetic, and Private AI servers.
  * =================================================================
  */
 
@@ -17,3 +17,4 @@ export { HomomorphicPrivateAiServer } from "./homomorphic-private-ai-server";
 export { MultiKeyThresholdFheEngine } from "./multi-key-threshold-fhe";
 export { AffineRingFheSecurityEngine } from "./affine-ring-fhe-security";
 export { HomomorphicCsamPsiMatcher } from "./homomorphic-csam-psi-matcher";
+export { Hpsi3dVisualizerEngine } from "./hpsi-3d-visualizer";
