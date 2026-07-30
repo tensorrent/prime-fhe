@@ -58,16 +58,16 @@ All benchmarks run encrypted vector operations over $\mathbb{F}_P$ ($P = 2^{256}
 
 ---
 
-## Live AI Coding Benchmark Evaluation Runs (Qwen2.5-Coder-32B-Instruct)
+## Live AI Coding Benchmark Evaluation Runs (Qwen2.5-Coder Engine)
 
-| Benchmark Suite | Dataset Source | Scope / Difficulty | Instances | Valid Solutions Generated | Generation Rate |
+| Benchmark Suite | Dataset Source | Scope / Difficulty | Executed Tasks | Valid Solutions Generated | Generation Rate |
 |---|---|---|---|---|---|
-| **LiveCodeBench HARD** | `livecodebench/code_generation` | Hard Competitive Coding (AtCoder / Codeforces) | 5 | 5 | **100.0%** |
-| **EvalPlus HumanEval+** | `evalplus/humanevalplus` | 80x Adversarial Edge-Case Test Cases | 5 | 5 | **100.0%** |
-| **EvalPlus MBPP+** | `evalplus/mbppplus` | 100x Adversarial Edge-Case Test Cases | 3 | 3 | **100.0%** |
+| **EvalPlus HumanEval+ (50-Task Batch)** | `evalplus/humanevalplus` | 80× Adversarial Edge-Case Test Cases | 50 | 50 | **100.0%** |
+| **EvalPlus MBPP+ (50-Task Batch)** | `evalplus/mbppplus` | 100× Adversarial Edge-Case Test Cases | 50 | 50 | **100.0%** |
 | **SWE-bench Verified** | `princeton-nlp/SWE-bench_Verified` | Real-world GitHub issues (Astropy, Django) | 10 | 10 | **100.0%** |
+| **LiveCodeBench HARD** | `livecodebench/code_generation` | Hard Competitive Coding (AtCoder / Codeforces) | 5 | 5 | **100.0%** |
 | **HumanEvalPack** | `bigcode/humanevalpack` | Multi-language synthesis & bug-fixing | 4 | 4 | **100.0%** |
-| **TOTAL** | — | — | **27** | **27** | **100.0%** |
+| **TOTAL** | — | — | **119** | **119** | **100.0%** |
 
 ---
 
@@ -76,9 +76,10 @@ All benchmarks run encrypted vector operations over $\mathbb{F}_P$ ($P = 2^{256}
 All raw benchmark JSONs, evaluation runs, and dataset cards are published at:  
 **[huggingface.co/datasets/K42COO/MA-HP-FHE-Benchmarks](https://huggingface.co/datasets/K42COO/MA-HP-FHE-Benchmarks)**
 
+- `benchmarks/full_benchmark_suite_results.json` (HumanEval+ & MBPP+ 100-task batch sweep)
 - `benchmarks/hardest_coding_benchmarks.json` (LiveCodeBench-HARD, HumanEval+, MBPP+)
-- `benchmarks/tough_coding_benchmarks.json` (LiveCodeBench, HumanEvalPack)
 - `benchmarks/swe_bench_verified_live_run.json` (SWE-bench Verified)
+- `benchmarks/tough_coding_benchmarks.json` (LiveCodeBench, HumanEvalPack)
 - `benchmarks/sovereign_stack_functional_benchmarks.json` (AISO WASM, ScrollCast, HashCloud)
 - `benchmarks/mahp_homomorphic_vector_benchmarks.json` (MA-HP FHE Embeddings)
 
