@@ -65,3 +65,9 @@ export {
   type AgentSubtask,
   type EncryptedBallot,
 } from "./multi-agent-orchestration-fabric";
+export {
+  MultiRingShiftCipher,
+  type Ring,
+  type RingCiphertext,
+  type ShiftRequest,
+} from "./multi-ring-shift-cipher";

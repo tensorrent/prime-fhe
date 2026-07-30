@@ -79,16 +79,31 @@ export function fieldElementToString(val: bigint): string {
 }
 
 /**
- * Generate a cryptographically-informed pseudorandom mask in [1, P-1].
+ * Generate a cryptographically secure mask in [1, P-1].
+ *
+ * ⚠️ THIS FUNCTION IS THE SECURITY OF THE WHOLE SCHEME. MA-HP's guarantee is
+ * information-theoretic — a one-time-pad argument — and it holds only while the
+ * mask is uniform AND unpredictable. It does not rest on a computational
+ * hardness assumption that could absorb a weak sampler.
+ *
+ * This previously drew from `Math.random()`, which is NOT a CSPRNG: V8 seeds an
+ * xorshift128+ generator with ~128 bits of state and an attacker who observes a
+ * handful of outputs can recover that state and predict every subsequent mask.
+ * Predictable masks make ciphertexts trivially unmaskable, which collapses the
+ * one-time-pad argument completely — a strictly worse failure than any of the
+ * algebraic issues elsewhere in this codebase, because it is invisible: every
+ * test still passes while the encryption provides no secrecy at all.
+ *
+ * Now sourced from the platform CSPRNG (Web Crypto, present in Node ≥ 19 and
+ * every browser). Modulo bias is negligible: 256 uniform bits reduced mod
+ * (P-1) where P-1 ≈ 2²⁵⁶ − 190.
  */
 export function generateMask(): bigint {
+  const bytes = new Uint8Array(32); // 256 bits
+  globalThis.crypto.getRandomValues(bytes);
   let mask = 0n;
-  for (let i = 0; i < 4; i++) {
-    const segment = BigInt(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER));
-    mask = (mask << 64n) | segment;
-  }
-  mask = ((mask % (P - 1n)) + P - 1n) % (P - 1n) + 1n;
-  return mask;
+  for (const b of bytes) mask = (mask << 8n) | BigInt(b);
+  return ((mask % (P - 1n)) + P - 1n) % (P - 1n) + 1n;
 }
 
 /**

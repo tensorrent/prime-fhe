@@ -183,7 +183,12 @@ export class HomomorphicViTEncoder {
     return results.sort((a, b) => {
       if (b.similarity_score > a.similarity_score) return 1;
       if (b.similarity_score < a.similarity_score) return -1;
-      return 0;
+      // Deterministic tie-break by motif id. Similarity is a dot product over
+      // F_137 — a 137-value space — so exact ties between motifs are COMMON
+      // rather than exotic, and `return 0` left the winner to iteration order.
+      // The top match then changed across identical runs, which is a ranking
+      // that cannot be verified. Ties now resolve on a stable key.
+      return a.motif_id < b.motif_id ? -1 : a.motif_id > b.motif_id ? 1 : 0;
     });
   }
 }
