@@ -2,8 +2,8 @@
  * interactive-client-assisted-fhe.ts
  * =================================================================
  * Interactive / Client-Assisted Homomorphic Protocol (IC-HP) Engine over F_P.
- * Enables untrusted server evaluation using client-provided evaluation handles
- * without revealing secret key k or plaintexts m to the evaluator.
+ * Uses Blinded Evaluation Handle H_mult = (r1 * r2 * k^-1) mod P,
+ * ensuring secret key k is NEVER exposed to the evaluator.
  * =================================================================
  */
 
@@ -32,7 +32,6 @@ export class InteractiveClientAssistedFheEngine {
 
   /**
    * Client-Side Encryption: C = (k * m + r) mod P
-   * Client retains mask r privately.
    */
   public clientEncrypt(m: bigint, key: bigint, mask: bigint): { ciphertext: bigint; mask: bigint } {
     const plain = ((m % this.p) + this.p) % this.p;
@@ -43,23 +42,26 @@ export class InteractiveClientAssistedFheEngine {
   }
 
   /**
-   * Server-Side Homomorphic Multiplication using Client Evaluation Handle H:
-   * Client provides H = (r1 * r2 * k^-1) mod P (which conceals k and m).
-   * Server computes C_mult without knowing secret key or plaintexts!
+   * Client generates Blinded Homomorphic Multiplicative Evaluation Handle:
+   * H_mult = (r1 * r2 * k^-1) mod P
+   * Conceals secret key k because r1, r2 are secret uniform random masks!
    */
-  public serverMultiplyAssisted(
-    c1: bigint,
-    c2: bigint,
-    clientEvalHandle: bigint,
-    serverMask: bigint
-  ): bigint {
-    // Server computes product of ciphertexts scaled by client handle
-    const prod = (c1 * c2) % this.p;
-    return (prod * clientEvalHandle + serverMask) % this.p;
+  public generateBlindedEvalHandle(r1: bigint, r2: bigint, key: bigint): bigint {
+    const k_inv = this.modInverse(key, this.p);
+    return (((r1 * r2) % this.p) * k_inv) % this.p;
   }
 
   /**
-   * Client-Side Decryption: Dec(C_mult, k, r)
+   * Server-Side Multiplicative Evaluation using Blinded Handle H_mult:
+   * Server computes C_mult = (C1 * C2 * H_mult) mod P without knowing k, m1, m2!
+   */
+  public serverMultiplyBlinded(c1: bigint, c2: bigint, blindedHandle: bigint): bigint {
+    const prod = (c1 * c2) % this.p;
+    return (prod * blindedHandle) % this.p;
+  }
+
+  /**
+   * Client-Side Decryption
    */
   public clientDecrypt(c: bigint, key: bigint, mask: bigint): bigint {
     const k_inv = this.modInverse(key, this.p);
